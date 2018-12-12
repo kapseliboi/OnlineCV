@@ -1,0 +1,11 @@
+{
+  "name": "onlinecv",
+  "version": "1.0.0",
+  "description": "Personal online cv",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm start"
+  },
+  "author": "",
+  "license": "ISC"
+}
