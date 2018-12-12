@@ -1,11 +1,35 @@
 {
   "name": "onlinecv",
   "version": "1.0.0",
-  "description": "Personal online cv",
+  "description": "online cv",
   "main": "server.js",
   "scripts": {
-    "test": "npm start"
+    "start": "node server.js",
+    "devserver": "./node_modules/nodemon/bin/nodemon.js run server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoekap/OnlineCV.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hoekap/OnlineCV/issues"
+  },
+  "homepage": "https://github.com/hoekap/OnlineCV#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
+    "concurrently": "^4.1.0",
+    "express": "^4.16.4",
+    "is-empty": "^1.2.0",
+    "jsonwebtoken": "^8.4.0",
+    "mongoose": "^5.3.16",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "validator": "^10.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.8"
+  }
 }
