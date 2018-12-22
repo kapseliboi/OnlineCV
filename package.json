@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "devserver": "./node_modules/nodemon/bin/nodemon.js run server.js"
+    "devserver": "./node_modules/nodemon/bin/nodemon.js run server.js",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run devserver\" \"npm run client\""
   },
   "repository": {
     "type": "git",
