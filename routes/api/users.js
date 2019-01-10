@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const keys = require("../../config/keys");
 const passport = require("passport");
+const generator = require("generate-password");
 
+const keys = require("../../config/keys");
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
 
@@ -20,11 +21,12 @@ router.post("/register", (req, res) => {
     if (user) {
       return res.status(400).json({ username: "Username already exists." });
     }
-
+    const newPassword = generator.generate({ length: 40, numbers: true,
+      symbols: true });
     const newUser = new User({
       name: req.body.name,
       username: req.body.username,
-      password: req.body.password
+      password: newPassword
     });
 
     bcrypt.genSalt(10, (err, salt) => {
@@ -36,7 +38,7 @@ router.post("/register", (req, res) => {
             console.log(err);
           }
           else {
-            res.json(user);
+            res.json({ newUser: newUser });
           }
         });
       });
