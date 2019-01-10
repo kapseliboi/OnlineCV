@@ -1,20 +1,35 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-const Generator = require("generate-password");
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import classnames from "classnames";
+
+import { registerUser } from "../../actions/authActions";
+
+function mapDispatchToProps(dispatch) {
+  return {
+    registerUser: newUser => dispatch(registerUser(newUser))
+  };
+}
+
+const mapStateToProps = state => {
+  return {
+    errors: state.registerErrors,
+    newUser: state.auth.newUser
+  };
+}
+
 
 class Register extends Component {
   constructor () {
     super();
     this.state = {
       name: "",
-      username: "",
-      password: "",
-      errors: {}
+      username: ""
     };
   }
 
   onChange = event => {
-    console.log(event.target.id);
     this.setState({ [event.target.id]: event.target.value });
   };
 
@@ -23,20 +38,15 @@ class Register extends Component {
 
     const newUser = {
       name: this.state.name,
-      username: this.state.username,
-      password: this.state.password
+      username: this.state.username
     };
     console.log(newUser);
-  }
+    this.props.registerUser(newUser);
+  };
 
-  generatePassword = () => {
-    const newPassword = Generator.generate({ length: 40, numbers: true,
-    symbols: true });
-    this.setState({password: newPassword});
-  }
 
   render () {
-    const { errors } = this.state;
+    const errors = this.props.errors;;
 
     return (
       <div className="container">
@@ -49,33 +59,28 @@ class Register extends Component {
               <label htmlFor="name">Name</label>
               <input onChange={this.onChange}
               value={this.state.name}
-              error={errors.name}
-              type="text" className="form-control" id="name"
+              type="text"
+              className={classnames("form-control", {"is-invalid": errors.name})}
+              id="name"
               placeholder="Name"/>
+              <div className={classnames({"invalid-feedback": "invalid-feedback"})}>
+                {errors.name}
+              </div>
             </div>
+
             <div className="form-group">
               <label htmlFor="username">Username</label>
               <input onChange={this.onChange}
               value={this.state.username}
-              error={errors.username}
-              type="text" className="form-control" id="username"
+              type="text"
+              className={classnames("form-control", {"is-invalid": errors.username})}
+              id="username"
               placeholder="Username"/>
+              <div className={classnames({"invalid-feedback": errors.username})}>
+                {errors.username}
+              </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <div className="row">
-                <input onChange={this.onChange}
-                value={this.state.password}
-                error={errors.password}
-                type="text" className="form-control col" id="password"
-                placeholder="Password" aria-describedby="passwordHelp"/>
-                <button className="btn btn-dark col-3" onClick={this.generatePassword}>
-                Generate password
-                </button>
-              </div>
-              <small id="passwordHelp" className="form-text">Password must be between 10 and 50 characters.</small>
-            </div>
             <button type="submit" className="btn btn-lg btn-primary">Submit</button>
           </form>
         </div>
@@ -86,4 +91,10 @@ class Register extends Component {
   }
 }
 
-export default Register;
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  newUser: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);
