@@ -3,17 +3,27 @@ import jwt_decode from "jwt-decode";
 
 import setAuthToken from "../utils/setAuthToken";
 import {
-  GET_ERRORS,
+  GET_LOGIN_ERRORS,
+  GET_REGISTER_ERRORS,
   SET_CURRENT_USER,
-  USER_LOADING
+  USER_LOADING,
+  NEW_USER_REGISTERED
 } from "./types";
 
+// Action creator
 export const registerUser = (userData, history) => dispatch => {
   axios.post("/api/users/register", userData).then(
-    res => history.push("login") // redirect to login if succesful
+    res => {
+      // history.push("login"); // redirect to login if succesful
+      const { newUser } = res.data;
+      dispatch({
+        type: NEW_USER_REGISTERED,
+        payload: newUser
+      });
+    }
   ).catch(
-    err => dispatch({
-      type: GET_ERRORS,
+    err => dispatch({   // Action
+      type: GET_REGISTER_ERRORS,
       payload: err.response.data
     })
   );
@@ -36,13 +46,13 @@ export const loginUser = userData => dispatch => {
     }
   ).catch(
     err => dispatch ({
-      type: GET_ERRORS,
+      type: GET_LOGIN_ERRORS,
       payload: err.response.data
-    });
+    })
   );
 };
 
-export const logoutUser = () => dispatch {
+export const logoutUser = () => dispatch => {
   localStorage.removeItem("jwtToken");
   setAuthToken(false);
   dispatch({
