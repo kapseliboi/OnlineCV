@@ -1,9 +1,19 @@
-import { GET_ERRORS } from "../actions/types";
+import { GET_REGISTER_ERRORS, GET_LOGIN_ERRORS } from "../actions/types";
 
 const initialState = {};
-export default function (state = initialState, action) {
+
+export function loginErrorReducer (state = initialState, action) {
   switch (action.type) {
-    case GET_ERRORS:
+    case GET_LOGIN_ERRORS:
+      return action.payload;
+    default:
+      return state;
+  }
+}
+
+export function registerErrorReducer (state = initialState, action) {
+  switch (action.type) {
+    case GET_REGISTER_ERRORS:
       return action.payload;
     default:
       return state;
