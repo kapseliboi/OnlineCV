@@ -4,9 +4,8 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Provider } from "react-redux";
 
 import store from "./store";
-import Navbar from "./components/layout/Navbar";
 import Landing from "./components/layout/Landing";
-import Register from "./components/auth/Register";
+import AuthLanding from "./components/layout/AuthLanding";
 
 class App extends Component {
   render() {
@@ -15,8 +14,8 @@ class App extends Component {
         <Router>
           <div className="App">
             <Switch>
-              <Route exact path="/register" component={Register} />
               <Route exact path="/" component={Landing} />
+              <Route exact path="/home" component={AuthLanding} />
             </Switch>
           </div>
         </Router>
