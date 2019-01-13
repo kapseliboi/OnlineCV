@@ -4,7 +4,7 @@ const setAuthToken = token => {
   if (token) {
     // If user is logged in apply token to every request
     // Validity of token will be checked by backend
-    axios.defaults.headers.common["Authorization"] = token;
+    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
   }
   else {
     delete axios.defaults.headers.common["Authorization"];
