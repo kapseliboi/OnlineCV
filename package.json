@@ -8,7 +8,8 @@
     "devserver": "./node_modules/nodemon/bin/nodemon.js run server.js",
     "client": "npm start --prefix client",
     "admin": "PORT=3001 npm start --prefix admin",
-    "dev": "concurrently \"npm run devserver\" \"npm run client\" \"npm run admin\""
+    "dev": "concurrently \"npm run devserver\" \"npm run client\" \"npm run admin\"",
+    "build": "npm build --prefix client && npm build --prefix admin"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "concurrently": "^4.1.0",
+    "ejs": "^2.6.1",
     "express": "^4.16.4",
     "generate-password": "^1.4.1",
     "is-empty": "^1.2.0",
