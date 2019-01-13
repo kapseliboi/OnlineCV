@@ -12,7 +12,13 @@ const validateLoginInput = require("../../validation/login");
 const User = require("../../models/User");
 
 // Register route
-router.post("/register", (req, res) => {
+router.post("/register", passport.authenticate("jwt", { session: false }),
+(req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({
+      error: "Not an admin"
+    });
+  }
   const { errors, isValid } = validateRegisterInput(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
@@ -60,7 +66,10 @@ router.post("/login", (req, res) => {
   User.findOne({ username: req.body.username }, (err, user) => {
     if (err) {
       console.log(err);
-      return res.status(401).json({error: "Username or password is incorrect."});
+      return res.status(401).json({error: "Something went wrong."});
+    }
+    else if (!user) {
+      return res.status(401).json({error: "Username or password is incorrect"});
     }
 
     bcrypt.compare(password, user.password, (err, result) => {
@@ -69,7 +78,9 @@ router.post("/login", (req, res) => {
       }
       const payload = {
         username: user.username,
-        name: user.name
+        name: user.name,
+        id: user.id,
+        isAdmin: user.isAdmin
       };
 
       jwt.sign(payload, keys.secretOrKey, {
@@ -78,7 +89,7 @@ router.post("/login", (req, res) => {
       (err, token) => {
         res.json({
           success: true,
-          token: "Bearer " + token
+          token: token
         });
       });
     });
@@ -91,6 +102,16 @@ router.get( "/currentuser", passport.authenticate("jwt", { session: false }),
     username: req.user.username,
     name: req.user.name
   });
+});
+
+router.get("/projectdata", passport.authenticate("jwt", { session: false }),
+(req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({
+      error: "Not an admin"
+    });
+  }
+  res.json({ success: true });
 });
 
 module.exports = router;
