@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "devserver": "./node_modules/nodemon/bin/nodemon.js run server.js",
-    "client": "cd client && npm start",
-    "dev": "concurrently \"npm run devserver\" \"npm run client\""
+    "client": "npm start --prefix client",
+    "admin": "PORT=3001 npm start --prefix admin",
+    "dev": "concurrently \"npm run devserver\" \"npm run client\" \"npm run admin\""
   },
   "repository": {
     "type": "git",
