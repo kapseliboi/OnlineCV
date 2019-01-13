@@ -29,7 +29,7 @@ export const registerUser = (userData, history) => dispatch => {
   );
 };
 
-export const loginUser = userData => dispatch => {
+export const loginUser = (userData, history) => dispatch => {
   dispatch({
     type: USER_LOADING
   });
@@ -39,16 +39,25 @@ export const loginUser = userData => dispatch => {
       localStorage.setItem("jwtToken", token);
       setAuthToken(token);
       const decoded = jwt_decode(token);
-      dispatch({
-        type: SET_CURRENT_USER,
-        payload: decoded
-      });
+      console.log(decoded);
+      if ( decoded.isAdmin ){
+        window.location.href = "http://localhost:3001";
+      }
+      else {
+        dispatch({
+          type: SET_CURRENT_USER,
+          payload: decoded
+        });
+        history.push("/home");
+      }
     }
   ).catch(
-    err => dispatch ({
+    err => {
+      dispatch ({
       type: GET_LOGIN_ERRORS,
       payload: err.response.data
-    })
+    });
+    }
   );
 };
 
