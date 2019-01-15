@@ -1,5 +1,4 @@
 import axios from "axios";
-import jwt_decode from "jwt-decode";
 
 import setAuthToken from "../utils/setAuthToken";
 import {
@@ -29,24 +28,29 @@ export const registerUser = (userData, history) => dispatch => {
   );
 };
 
+export const getCSRFToken = () => dispatch => {
+  axios.get("/api/csrftoken").then(
+    res => {
+      const { csrftoken } = res.data;
+      axios.defaults.headers.common["csrf-token"] = csrftoken;
+    }
+  );
+};
+
 export const loginUser = (userData, history) => dispatch => {
   dispatch({
     type: USER_LOADING
   });
   axios.post("/api/users/login", userData).then(
     res => {
-      const {token} = res.data;
-      localStorage.setItem("jwtToken", token);
-      setAuthToken(token);
-      const decoded = jwt_decode(token);
-      console.log(decoded);
-      if ( decoded.isAdmin ){
+      const {payload} = res.data;
+      if ( payload.isAdmin ){
         window.location.href = "http://localhost:3001";
       }
       else {
         dispatch({
           type: SET_CURRENT_USER,
-          payload: decoded
+          payload: payload
         });
         history.push("/home");
       }
@@ -61,11 +65,13 @@ export const loginUser = (userData, history) => dispatch => {
   );
 };
 
-export const logoutUser = () => dispatch => {
-  localStorage.removeItem("jwtToken");
-  setAuthToken(false);
-  dispatch({
-    type: SET_CURRENT_USER,
-    payload: ""
+export const logoutUser = history => dispatch => {
+  axios.post("/api/users/logout").then(
+    res => {}).catch((err) => {}).then( () => {
+    dispatch({
+      type: SET_CURRENT_USER,
+      payload: ""
+    });
+    history.push("/");
   });
 };
