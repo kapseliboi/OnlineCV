@@ -2,41 +2,68 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { logoutUser } from "../../actions/authActions";
 
-
+function mapDispatchToProps(dispatch) {
+  return {
+    logoutUser: () => dispatch(logoutUser())
+  };
+}
 
 class Navbar extends Component {
-  componentDidMount(){
-    
+
+  onLogoutClicked = () => {
+    this.props.logoutUser();
   }
 
   render () {
-    const name = this.props.name;
+    const name = "this.props.name";
+    const username ="asdfasdfasdf";
     return (
-      <nav className="navbar navbar-expand-md navbar-dark bg-dark w-100"
+      <header className="navbar navbar-expand navbar-dark bg-dark"
       role="navigation">
-        <span className="navbar-brand mb-0 h1">{name}</span>
-        <button className="navbar-toggler" type="button" data-toggle="collapse"
-          data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-          aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav nav-justified mr-auto w-100">
-            <li className="nav-item active">
-              <Link className="nav-link active" to="/">CV</Link>
-            </li>
-            <li className="nav-item active">
-              <Link className="nav-link" to="/projects">Projects</Link>
-            </li>
-            <li className="nav-item active">
-              <Link className="nav-link" to="/users">Users</Link>
-            </li>
-          </ul>
-        </div>
-      </nav>
+      <div className="navbar-nav">
+        <ul className="navbar-nav flex-row">
+          <li className="nav-item active btn-link mx-5">
+            <Link className="nav-link active" to="/"><big>CV</big></Link>
+          </li>
+          <li className="nav-item active btn-link mx-5">
+            <Link className="nav-link" to="/projects"><big>Projects</big></Link>
+          </li>
+          <li className="nav-item btn-link active mx-5">
+            <Link className="nav-link" to="/users"><big>Users</big></Link>
+          </li>
+        </ul>
+      </div>
+
+      <div className="ml-auto navbar-nav">
+        <ul className="navbar-nav ml-auto">
+          <li className="nav-item active dropdown">
+            <button className="nav-item btn-link btn nav-link dropdown-toggle ml-auto"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+            id="navbarDropdown">
+            {name}
+            </button>
+            <div className="dropdown-menu dropdown-menu-right"
+            aria-labelledby="navbarDropdown">
+              <form>
+                <span className="dropdown-item-text">{username}</span>
+              </form>
+              <div className="dropdown-divider"></div>
+              <button className="dropdown-item btn-link" onClick={this.onLogoutClicked}>
+              Logout
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </header>
     );
   }
 }
 
-export default Navbar;
+Navbar.propTypes = {
+  logoutUser: PropTypes.func.isRequired
+};
+
+export default connect(null, mapDispatchToProps)(Navbar);
