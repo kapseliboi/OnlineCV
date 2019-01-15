@@ -2,8 +2,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
+
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
+
+const path = require("path");
 
 const users = require("./routes/api/users");
 
@@ -47,6 +50,7 @@ app.use(csrf({ cookie: true }));
 // Routes
 app.use("/api/users", users);
 
+
 app.get("/api/csrftoken", (req, res) => {
   res.json({ csrftoken: req.csrfToken() });
 });
@@ -58,6 +62,14 @@ app.use((err, req, res, next) => {
   }
   res.status(403).json({ error: "Form has been tampered with" });
 });
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+  app.set("views", "client/views");
+  app.set("view engine", "ejs");
+  app.get("/", (req, res) => {
+    res.render("index");
+  });
+}
 
 const port = process.env.PORT || 5000; // Setting up for possible heroku deployment
 
