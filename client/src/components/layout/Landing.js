@@ -3,9 +3,7 @@ import React, { Component } from "react";
 import Login from "./../auth/Login";
 
 class Landing extends Component {
-  componentDidMount () {
-    console.log("Landing");
-  }
+  
   render () {
     return (
       <div className="container">
