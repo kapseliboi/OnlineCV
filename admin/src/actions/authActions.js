@@ -1,5 +1,4 @@
 import axios from "axios";
-import jwt_decode from "jwt-decode";
 
 import setAuthToken from "../utils/setAuthToken";
 import {
@@ -29,34 +28,45 @@ export const registerUser = (userData, history) => dispatch => {
   );
 };
 
-export const loginUser = userData => dispatch => {
-  dispatch({
-    type: USER_LOADING
-  });
-  axios.post("/api/users/login", userData).then(
+export const getCSRFToken = () => dispatch => {
+  axios.get("/api/csrftoken").then(
     res => {
-      const {token} = res.data;
-      localStorage.setItem("jwtToken", token);
-      setAuthToken(token);
-      const decoded = jwt_decode(token);
-      dispatch({
-        type: SET_CURRENT_USER,
-        payload: decoded
-      });
+      const { csrftoken } = res.data;
+      axios.defaults.headers.common["csrf-token"] = csrftoken;
     }
-  ).catch(
-    err => dispatch ({
-      type: GET_LOGIN_ERRORS,
-      payload: err.response.data
-    })
   );
 };
 
+export const getUser = () => dispatch => {
+  // dispatch({
+  //   type: USER_LOADING
+  // });
+  // axios.post("/api/getcurrentuser", userData).then(
+  //   res => {
+  //     const {payload} = res.data;
+  //     localStorage.setItem("jwtToken", token);
+  //     setAuthToken(token);
+  //     const decoded = jwt_decode(token);
+  //     dispatch({
+  //       type: SET_CURRENT_USER,
+  //       payload: payload
+  //     });
+  //   }
+  // ).catch(
+  //   err => dispatch ({
+  //     type: GET_LOGIN_ERRORS,
+  //     payload: err.response.data
+  //   })
+  // );
+};
+
 export const logoutUser = () => dispatch => {
-  localStorage.removeItem("jwtToken");
-  setAuthToken(false);
-  dispatch({
-    type: SET_CURRENT_USER,
-    payload: ""
-  });
+  axios.post("/api/users/logout").then(
+    res => {
+      window.location.href = "http://localhost:3000";
+    }
+  ).catch(function(err) {
+    window.location.href = "http://localhost:3000";
+  }
+  );
 };
