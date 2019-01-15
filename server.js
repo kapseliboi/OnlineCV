@@ -2,10 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
+const csrf = require("csurf");
+const cookieParser = require("cookie-parser");
 
 const users = require("./routes/api/users");
 
 const app = express();
+
 
 // Bodyparser middleware used to parse incoming request bodies
 app.use(
@@ -31,14 +34,30 @@ mongoose.connect(db, {useNewUrlParser: true}, (err) => {
   }
 });
 
+app.use(cookieParser());
+
 // Passport middleware
 app.use(passport.initialize());
 
 // Passport configuration
 require("./config/passport")(passport);
 
+app.use(csrf({ cookie: true }));
+
 // Routes
 app.use("/api/users", users);
+
+app.get("/api/csrftoken", (req, res) => {
+  res.json({ csrftoken: req.csrfToken() });
+});
+
+// Error handling
+app.use((err, req, res, next) => {
+  if (err.code!=="EBADCSRFTOKEN"){
+    return next(err);
+  }
+  res.status(403).json({ error: "Form has been tampered with" });
+});
 
 const port = process.env.PORT || 5000; // Setting up for possible heroku deployment
 

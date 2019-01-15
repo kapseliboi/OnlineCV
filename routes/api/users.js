@@ -87,13 +87,20 @@ router.post("/login", (req, res) => {
         expiresIn: "24h"
       },
       (err, token) => {
+        res.cookie("jwt", token);
         res.json({
           success: true,
-          token: token
+          payload: payload
         });
       });
     });
   });
+});
+
+router.post("/logout", passport.authenticate("jwt", { session:false }),
+(req, res) => {
+  res.clearCookie("jwt");
+  res.json({ success: true });
 });
 
 router.get( "/currentuser", passport.authenticate("jwt", { session: false }),
@@ -113,5 +120,6 @@ router.get("/projectdata", passport.authenticate("jwt", { session: false }),
   }
   res.json({ success: true });
 });
+
 
 module.exports = router;
