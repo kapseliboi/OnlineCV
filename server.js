@@ -45,7 +45,7 @@ app.use(passport.initialize());
 // Passport configuration
 require("./config/passport")(passport);
 
-app.use(csrf({ cookie: true }));
+app.use(csrf({ cookie: { httpOnly: true } }));
 
 // Routes
 app.use("/api/users", users);

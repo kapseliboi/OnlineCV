@@ -87,7 +87,7 @@ router.post("/login", (req, res) => {
         expiresIn: "24h"
       },
       (err, token) => {
-        res.cookie("jwt", token);
+        res.cookie("jwt", token, {httpOnly: true});
         res.json({
           success: true,
           payload: payload
