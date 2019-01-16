@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './App.css';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
 
@@ -8,6 +7,7 @@ import Navbar from "./components/layout/Navbar";
 import Landing from "./components/layout/Landing";
 import Projects from "./components/layout/Projects";
 import Users from "./components/layout/Users";
+require ('./App.css');
 
 function mapDispatchToProps(dispatch) {
   return {
