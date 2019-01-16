@@ -25,13 +25,13 @@ class Navbar extends Component {
       role="navigation">
       <div className="navbar-nav">
         <ul className="navbar-nav flex-row">
-          <li className="nav-item active btn-link mx-5">
+          <li className="nav-item active btn-link mx-md-5">
             <Link className="nav-link active" to="/"><big>CV</big></Link>
           </li>
-          <li className="nav-item active btn-link mx-5">
+          <li className="nav-item active btn-link mx-md-5">
             <Link className="nav-link" to="/"><big>Why?</big></Link>
           </li>
-          <li className="nav-item btn-link active mx-5">
+          <li className="nav-item btn-link active mx-md-5">
             <Link className="nav-link" to="/"><big>Projects</big></Link>
           </li>
         </ul>
