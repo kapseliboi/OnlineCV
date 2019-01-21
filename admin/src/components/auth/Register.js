@@ -17,7 +17,7 @@ const mapStateToProps = state => {
     errors: state.registerErrors,
     newUser: state.auth.newUser
   };
-}
+};
 
 
 class Register extends Component {
@@ -63,7 +63,7 @@ class Register extends Component {
               className={classnames("form-control", {"is-invalid": errors.name})}
               id="name"
               placeholder="Name"/>
-              <div className={classnames({"invalid-feedback": "invalid-feedback"})}>
+              <div className={classnames({"invalid-feedback": errors.name})}>
                 {errors.name}
               </div>
             </div>
