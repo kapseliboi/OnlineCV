@@ -1,20 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
-import ProjectElement from "../project/projectelement";
-import { getProjectData } from "../../actions/dataActions";
+import ProjectElement from "../project/ProjectElement";
 
-
-function mapDispatchToProps(dispatch) {
-  return {
-    getProjectData: () => dispatch(getProjectData())
-  };
-}
 
 const mapStateToProps = state => {
   return {
-    projects: state.projects
+    projects: state.data.projects
   };
 };
 
@@ -24,11 +18,6 @@ class Projects extends Component {
     this.state = {
       header: ""
     };
-  }
-
-  componentDidMount () {
-    console.log("getProjectData-call")
-    this.props.getProjectData();
   }
 
   onChange = event => {
@@ -50,15 +39,19 @@ class Projects extends Component {
   };
 
   render () {
-    const projects = this.jsxProjects();
     const header = "";
-
+    console.log(this.props.projects);
     return (
       <main className="py-md-4 pl-md-5">
         <h1>Your projects</h1>
-        {projects}
-        <button type="button" onClick={this.props.addNewProject}
-        className="btn btn-lg btn-primary">Add a new project</button>
+        <div className="container-fluid my-2">
+          {this.props.projects.map((project, i) =>
+            <ProjectElement key={this.props.projects[i].id}
+            name={this.props.projects[i].title} />
+          )}
+        </div>
+        <Link to="/projects/add"
+        className="btn btn-lg btn-primary">Add a new project</Link>
 
         <h1 className="py-md-4">Your project settings</h1>
         <form onSubmit={this.onSubmit}>
@@ -83,4 +76,4 @@ class Projects extends Component {
   }
 }
 
-export default connect(null, mapDispatchToProps)(Projects);
+export default connect(mapStateToProps, null)(Projects);
