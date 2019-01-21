@@ -7,5 +7,5 @@ export default combineReducers({
   auth: authReducer,
   loginErrors: loginErrorReducer,
   registerErrors: registerErrorReducer,
-  dataReducer: dataReducer
+  data: dataReducer
 });
