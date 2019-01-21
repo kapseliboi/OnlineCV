@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 
 const users = require("./routes/api/users");
+const admins = require("./routes/api/admins");
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use(csrf({ cookie: { httpOnly: true } }));
 
 // Routes
 app.use("/api/users", users);
+app.use("/api/admins", admins);
 
 
 app.get("/api/csrftoken", (req, res) => {
@@ -57,7 +59,9 @@ app.get("/api/csrftoken", (req, res) => {
 
 // Error handling
 app.use((err, req, res, next) => {
+  // CSRF
   if (err.code!=="EBADCSRFTOKEN"){
+    console.log(err);
     return next(err);
   }
   res.status(403).json({ error: "Form has been tampered with" });
