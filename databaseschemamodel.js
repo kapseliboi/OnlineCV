@@ -30,14 +30,15 @@
   [{ text: { type: String, required: true }, position: { type: Integer, required: true } }],
 
   images:
-  [ { location: { type: String, required: true },
+  [ { url: { type: String, required: true }, description: { type: String },
     caption: { type: String }, position: { type: Integer, required: true } } ],
 
   owner: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true
-  }
+  },
+  position: { type: Integer, required: true }
 }
 
 // Why-text
@@ -83,11 +84,11 @@
 {
   workhistory: [{ employer: { type: String, required: true },
                   title: { type: String, required: true },
-                  timespan: [{ start: { type: String, required: true },
-                               end: { type: String, required: true }}],
+                  timespan: [{ start: { type: Date, required: true },
+                               end: { type: Date, required: true }}],
                   description: { type: String, required: true }
                }],
-  personalinfo: { birthdate: { type: String, required: true },
+  personalinfo: { birthdate: { type: Date, required: true },
                   email: { type: String, required: true },
                   phonenumber: { type: String, required: true }},
 
