@@ -29,14 +29,6 @@ class Projects extends Component {
 
   };
 
-  jsxProjects = () => {
-    return (
-        <div className="container-fluid my-2">
-          <ProjectElement key={1} id={1} name={"Superprojekti"}/>
-          <ProjectElement key={2} id={2} name={"Ei niin superprojekti"}/>
-        </div>
-      );
-  };
 
   render () {
     const header = "";
