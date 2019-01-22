@@ -9,15 +9,14 @@ import {createProject} from "../../actions/dataActions";
 
 function mapDispatchToProps(dispatch) {
   return {
-    createProject: (formData, title, projectCount, history) => dispatch(
-      createProject(formData, title, projectCount, history))
+    createProject: (formData, title, history) => dispatch(
+      createProject(formData, title, history))
   };
 }
 
 const mapStateToProps = state => {
   return {
-    loading: state.data.creating,
-    projectCount: state.data.projects.length
+    loading: state.data.creating
   };
 };
 
@@ -35,7 +34,7 @@ class ProjectCreation extends Component {
   onSubmit = event => {
     event.preventDefault();
     this.props.createProject(this.state.content, this.state.title,
-      this.props.projectCount, this.props.history);
+    this.props.history);
   };
 
 
