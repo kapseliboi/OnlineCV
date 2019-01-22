@@ -4,11 +4,20 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
 import ProjectElement from "../project/ProjectElement";
+import { moveProjectUp, moveProjectDown, deleteProject } from "../../actions/dataActions";
 
+function mapDispatchToProps(dispatch) {
+  return {
+    moveProjectUp: (index) => dispatch(moveProjectUp(index)),
+    moveProjectDown: (index) => dispatch(moveProjectDown(index)),
+    deleteProject: (index) => dispatch(deleteProject(index))
+  };
+}
 
 const mapStateToProps = state => {
   return {
-    projects: state.data.projects
+    projects: state.data.projects,
+    moving: state.data.moving
   };
 };
 
@@ -16,7 +25,8 @@ class Projects extends Component {
   constructor () {
     super();
     this.state = {
-      header: ""
+      header: "",
+      toRemove: null
     };
   }
 
@@ -26,8 +36,11 @@ class Projects extends Component {
 
   onSubmit = event => {
     event.preventDefault();
-
   };
+
+  setToBeRemoved = (index) => {
+    this.setState({toRemove: index});
+  }
 
 
   render () {
@@ -39,7 +52,10 @@ class Projects extends Component {
         <div className="container-fluid my-2">
           {this.props.projects.map((project, i) =>
             <ProjectElement key={this.props.projects[i].id}
-            name={this.props.projects[i].title} />
+            name={this.props.projects[i].title}
+            moveUp={this.props.moveProjectUp}
+            moveDown={this.props.moveProjectDown}
+            index={i} moving={this.props.moving} />
           )}
         </div>
         <Link to="/projects/add"
@@ -68,4 +84,4 @@ class Projects extends Component {
   }
 }
 
-export default connect(mapStateToProps, null)(Projects);
+export default connect(mapStateToProps, mapDispatchToProps)(Projects);
