@@ -35,6 +35,8 @@ router.post("/projects/create", upload, (req, res) => {
     });
   }
 
+  var countPromise = Project.count({ owner: req.user.id }).exec();
+
   var content = [];
   var imgIndex = 0;
   var textIndex = 0;
@@ -100,18 +102,25 @@ router.post("/projects/create", upload, (req, res) => {
     }
   }
   console.log(content);
-  const newProject = new Project({
-    title: req.body.title,
-    content: content,
-    owner: req.user.id,
-    position: req.body.count
-  });
-  newProject.save((err, project) => {
+  countPromise.then((count) => {
+    const newProject = new Project({
+      title: req.body.title,
+      content: content,
+      owner: req.user.id,
+      position: count
+    });
+    newProject.save((err, project) => {
+      if (err) {
+        console.log(err);
+      }
+      else {
+        res.json({success: true});
+      }
+    });
+  }).catch( err => {
     if (err) {
       console.log(err);
-    }
-    else {
-      res.json({success: true});
+      return res.status(500).json({error: "Something went wrong, please try again later."});
     }
   });
 });
@@ -122,16 +131,70 @@ router.get("/startdata", (req, res) => {
       error: "Not an admin"
     });
   }
-  Project.find({owner: req.user.id}, "-_id content title", (err, projects) => {
+  Project.find({owner: req.user.id}, "-_id content title").sort("position").then(
+    (projects) => {
+
+    console.log(projects);
+    console.log(req.user);
+    res.json({success: true, projects: projects, user: req.user});
+    }
+  ).catch( err => {
     if (err) {
       console.log(err);
       res.status(500).json({error: "Something went wrong, please try again later."});
     }
-    else {
-      console.log(projects);
-      res.json({success: true, projects: projects});
+  });
+});
+
+router.post("/projects/moveUp", (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({
+      error: "Not an admin"
+    });
+  }
+  Project.findOne({position: req.body.index}, (err, project) => {
+    if (err || !project) {
+      console.log(err);
+      console.log(project);
+      return res.status(500).json({error: "Something went wrong."});
     }
-  })
+    Project.findOne({position: req.body.index-1}, (err2, project2) => {
+      if (err2 || !project2) {
+        console.log("Error2");
+        return res.status(500).json({error: "Something went wrong."});
+      }
+      project2.position = req.body.index;
+      project.position = req.body.index-1;
+      project2.save();
+      project.save();
+      return res.json({success: true});
+    });
+  });
+
+});
+
+router.post("/projects/moveDown", (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({
+      error: "Not an admin"
+    });
+  }
+  Project.findOne({position: req.body.index}, (err, project) => {
+    if (err || !project) {
+      return res.status(500).json({error: "Something went wrong."});
+    }
+    Project.findOne({position: req.body.index+1}, (err2, project2) => {
+      if (err2 || !project2) {
+        return res.status(500).json({error: "Something went wrong."});
+      }
+      project2.position = req.body.index;
+      project.position = req.body.index+1;
+      project2.save();
+      project.save();
+      return res.json({success: true});
+    });
+  });
+
 });
 
 module.exports = router;
