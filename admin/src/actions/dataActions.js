@@ -1,6 +1,7 @@
 import axios from "axios";
 
-import { GET_PROJECT_DATA, CREATING_PROJECT, CREATE_PROJECT, GET_START_DATA }
+import { GET_PROJECT_DATA, CREATING_PROJECT, CREATE_PROJECT, GET_START_DATA,
+MOVE_PROJECT_UP, MOVE_PROJECT_DOWN, DELETE_PROJECT, MOVING_PROJECT }
 from "./types";
 
 
@@ -20,7 +21,7 @@ export const getProjectData = () => dispatch => {
   );
 }
 
-export const createProject = (data, title, projectCount, history) => dispatch => {
+export const createProject = (data, title, history) => dispatch => {
   console.log("SUORITETAAN POST");
   dispatch({ type: CREATING_PROJECT });
   var formData = new FormData();
@@ -36,7 +37,6 @@ export const createProject = (data, title, projectCount, history) => dispatch =>
     }
   }
   formData.append("title", title);
-  formData.append("count", projectCount);
   axios.post("/api/admins/projects/create", formData, {withCredentials: true,
   "Content-Type": "multipart/form-data"}).then(
     res => {
@@ -62,6 +62,46 @@ export const getStartData = () => dispatch => {
   axios.get("/api/admins/startdata", {withCredentials: true}).then(
     res => {
       dispatch({type: GET_START_DATA, payload: res.data.projects});
+    }
+  ).catch(
+    err => {
+      // TODO
+    }
+  );
+};
+
+export const moveProjectUp = (index) => dispatch => {
+  dispatch({type: MOVING_PROJECT});
+  console.log(index);
+  axios.post("/api/admins/projects/moveUp", {index: index}, {withCredentials: true}).then(
+    res => {
+      dispatch({type: MOVE_PROJECT_UP, payload: index});
+    }
+  ).catch(
+    err => {
+      // TODO
+    }
+  );
+};
+
+export const moveProjectDown = (index) => dispatch => {
+  dispatch({type: MOVING_PROJECT});
+  axios.post("/api/admins/projects/moveDown", {index: index}, {withCredentials: true}).then(
+    res => {
+      dispatch({type: MOVE_PROJECT_DOWN, payload: index});
+    }
+  ).catch(
+    err => {
+      // TODO
+    }
+  );
+};
+
+export const deleteProject = (index) => dispatch => {
+  dispatch({type: MOVING_PROJECT});
+  axios.post("/api/admins/projects/delete", {index: index}, {withCredentials: true}).then(
+    res => {
+      dispatch({type: DELETE_PROJECT, payload: index});
     }
   ).catch(
     err => {
