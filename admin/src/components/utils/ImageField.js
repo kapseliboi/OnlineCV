@@ -6,6 +6,12 @@ const ImageField = props => {
       <div className="border border-secondary col-10">
         <div className="form-group mx-1 my-1">
           <label htmlFor={"image" + props.id}>Upload image</label>
+
+          {props.edit && props.url &&
+            <a href={"/" + props.url} target="_blank"
+            rel="noopener noreferrer">Current image</a>
+          }
+
           <input type="file" name="image" id={"image" + props.id}
           onChange={(e) => props.onImageChange(props.index, e)}
           accept="image/png, image/jpeg" className="form-control-file"/>
