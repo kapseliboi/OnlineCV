@@ -5,36 +5,64 @@ import { connect } from "react-redux";
 import ImageField from "../utils/ImageField";
 import TextField from "../utils/TextField";
 import Modal from "../utils/Modal";
-import {createProject} from "../../actions/dataActions";
+import {createOrUpdateProject} from "../../actions/dataActions";
 
 function mapDispatchToProps(dispatch) {
   return {
-    createProject: (formData, title, history) => dispatch(
-      createProject(formData, title, history))
+    createOrUpdateProject: (formData, title, history, index) => dispatch(
+      createOrUpdateProject(formData, title, history, index))
   };
 }
 
 const mapStateToProps = state => {
   return {
-    loading: state.data.creating
+    loading: state.data.creating,
+    projects: state.data.projects
   };
 };
 
 class ProjectCreation extends Component {
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
+    var newContent = [];
+    var title = "";
+    var id = 0;
+    var edit = false;
+    if (this.props.match.params.index) {
+      if (!this.props.projects[this.props.match.params.index]) {
+        this.props.history.push("/projects");
+      }
+      else {
+        newContent = this.props.projects[this.props.match.params.index].content.map(
+          (content, i) => {
+            content.id = i;
+            return content;
+          }
+        );
+        edit = true;
+        id = newContent.length;
+        title = this.props.projects[this.props.match.params.index].title;
+      }
+    }
     this.state = {
-      title: "",
-      content: [],
-      id: 0,
-      toRemove: null
+      title: title,
+      content: newContent,
+      id: id,
+      toRemove: null,
+      edit: edit
     };
   }
 
   onSubmit = event => {
     event.preventDefault();
-    this.props.createProject(this.state.content, this.state.title,
-    this.props.history);
+    if (this.state.edit) {
+      this.props.createOrUpdateProject(this.state.content, this.state.title,
+        this.props.history, this.props.match.params.index);
+    }
+    else {
+      this.props.createOrUpdateProject(this.state.content, this.state.title,
+        this.props.history, null);
+    }
   };
 
 
@@ -81,7 +109,7 @@ class ProjectCreation extends Component {
     const newContent = this.state.content.concat({
       type: "text",
       text: "",
-      id: this.state.content
+      id: this.state.id
     });
     this.setState({ content: newContent, id: this.state.id + 1 });
   };
@@ -123,7 +151,7 @@ class ProjectCreation extends Component {
           index={i} onImageChange={this.onImageChange}
           onCaptionChange={this.onImageCaptionChange}
           onDescriptonChange={this.onImageDescriptionChange}
-          setRemoved={this.setToBeRemoved}
+          setRemoved={this.setToBeRemoved} edit={this.state.edit}
           moveUp={this.onMoveFieldUp} moveDown={this.onMoveFieldDown}
           key={field.id} />
         );
@@ -141,7 +169,7 @@ class ProjectCreation extends Component {
 
     // Modal setup
     var target = "";
-    if (this.state.toRemove) {
+    if (this.state.toRemove !== null) {
       if (this.state.content[this.state.toRemove].type === "text") {
         target = "this text field";
       }
@@ -150,7 +178,16 @@ class ProjectCreation extends Component {
       }
     }
     // Submit button text
-    const submitText = this.props.loading ? "Loading" : "Create";
+    var submitText;
+    if (this.props.loading) {
+      submitText = "Loading";
+    }
+    else if (this.state.edit) {
+      submitText = "Save changes";
+    }
+    else {
+      submitText ="Create";
+    }
 
     return (
       <main className="py-md-4 pl-md-5">
