@@ -1,7 +1,8 @@
 import axios from "axios";
 
 import { GET_PROJECT_DATA, CREATING_PROJECT, CREATE_PROJECT, GET_START_DATA,
-MOVE_PROJECT_UP, MOVE_PROJECT_DOWN, DELETE_PROJECT, MOVING_PROJECT }
+MOVE_PROJECT_UP, MOVE_PROJECT_DOWN, DELETE_PROJECT, MOVING_PROJECT,
+UPDATE_PROJECT }
 from "./types";
 
 
@@ -21,8 +22,7 @@ export const getProjectData = () => dispatch => {
   );
 }
 
-export const createProject = (data, title, history) => dispatch => {
-  console.log("SUORITETAAN POST");
+export const createOrUpdateProject = (data, title, history, index) => dispatch => {
   dispatch({ type: CREATING_PROJECT });
   var formData = new FormData();
   for (var i = 0; i < data.length; i++) {
@@ -37,16 +37,34 @@ export const createProject = (data, title, history) => dispatch => {
     }
   }
   formData.append("title", title);
-  axios.post("/api/admins/projects/create", formData, {withCredentials: true,
+  var postURL;
+  if (index) {
+    formData.append("index", index);
+    postURL = "/api/admins/projects/update";
+  }
+  else {
+    postURL = "/api/admins/projects/create";
+  }
+  axios.post(postURL, formData, {withCredentials: true,
   "Content-Type": "multipart/form-data"}).then(
     res => {
-      var project = data.map((instance) => {
+      var imgIndex = 0;
+      const content = data.map((instance) => {
         if (instance.type === "image") {
           delete instance.file;
+          instance.url = res.data.imgURLs[imgIndex];
+          imgIndex++;
         }
+        return instance;
       });
-      project.title = title;
-      dispatch({ type: CREATE_PROJECT, payload: project });
+
+      const project = {title: title, content: content}
+      if (index) {
+        dispatch({ type: UPDATE_PROJECT, payload: project, index: index});
+      }
+      else {
+        dispatch({ type: CREATE_PROJECT, payload: project });
+      }
       history.push("/projects");
     }
   ).catch(
@@ -61,7 +79,7 @@ export const createProject = (data, title, history) => dispatch => {
 export const getStartData = () => dispatch => {
   axios.get("/api/admins/startdata", {withCredentials: true}).then(
     res => {
-      dispatch({type: GET_START_DATA, payload: res.data.projects});
+      dispatch({type: GET_START_DATA, payload: res.data});
     }
   ).catch(
     err => {
