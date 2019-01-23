@@ -32,6 +32,7 @@ class App extends Component {
             <Route exact path="/projects" component={Projects} />
             <Route exact path="/users" component={Users} />
             <Route exact path="/projects/add" component={ProjectCreation} />
+            <Route exact path="/projects/edit/:index" component={ProjectCreation} />
           </Switch>
         </div>
       </Router>
