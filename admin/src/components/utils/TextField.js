@@ -8,7 +8,7 @@ const TextField = props => {
           <label htmlFor={"text" + props.id}>Text</label>
           <textarea name="textarea" id={"text" + props.id}
           onChange={(e) => props.onTextChange(props.index, e)}
-          className="form-control" rows="15"/>
+          value={props.text} className="form-control" rows="15"/>
         </div>
       </div>
       <div className="col-2 d-flex justify-content-end">
