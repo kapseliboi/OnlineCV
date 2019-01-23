@@ -1,12 +1,14 @@
 import { GET_PROJECT_DATA, CREATE_PROJECT, CREATING_PROJECT, GET_START_DATA,
-  MOVE_PROJECT_UP, MOVE_PROJECT_DOWN, DELETE_PROJECT, MOVING_PROJECT }
+  MOVE_PROJECT_UP, MOVE_PROJECT_DOWN, DELETE_PROJECT, MOVING_PROJECT,
+  UPDATE_PROJECT }
 from "../actions/types";
 
 const initialState = {
   projects: [],
   creating: false,
   moving: false,
-  id: 0
+  id: 0,
+  user: {}
 };
 
 export default function (state = initialState, action) {
@@ -29,6 +31,17 @@ export default function (state = initialState, action) {
         creating: false,
         projects: state.projects.concat({...action.payload, id: state.id}),
         id: state.id + 1
+      };
+    }
+    case UPDATE_PROJECT: {
+      var updatedProjects = state.projects.slice();
+      const updatedProjectID = updatedProjects[action.index].id;
+      updatedProjects[action.index] = action.payload;
+      updatedProjects[action.index].id = updatedProjectID;
+      return {
+        ...state,
+        creating: false,
+        projects: updatedProjects
       };
     }
     case MOVING_PROJECT: {
@@ -70,7 +83,7 @@ export default function (state = initialState, action) {
     }
     case GET_START_DATA: {
       var id = state.id;
-      const projects = action.payload.map(project => {
+      const projects = action.payload.projects.map(project => {
         project.id = id;
         id++;
         return project;
@@ -78,7 +91,8 @@ export default function (state = initialState, action) {
       return {
         ...state,
         projects: projects,
-        id: id
+        id: id,
+        user: action.payload.user
       };
     }
     default: {
