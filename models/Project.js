@@ -8,8 +8,7 @@ const projectSchema = new Schema ({
   },
 
   content: {
-    type: Array,
-    required: true
+    type: Array
   },
 
   owner: {
