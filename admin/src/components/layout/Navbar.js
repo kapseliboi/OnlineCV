@@ -12,6 +12,12 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
+const mapStateToProps = (state) => {
+  return {
+    user: state.data.user
+  };
+};
+
 class Navbar extends Component {
   componentDidMount () {
     this.props.getStartData();
@@ -22,8 +28,8 @@ class Navbar extends Component {
   }
 
   render () {
-    const name = "this.props.name";
-    const username ="asdfasdfasdf";
+    const name = this.props.user.name;
+    const username = this.props.user.username;
     return (
       <header className="navbar navbar-expand navbar-dark bg-dark"
       role="navigation">
@@ -71,4 +77,4 @@ Navbar.propTypes = {
   logoutUser: PropTypes.func.isRequired
 };
 
-export default connect(null, mapDispatchToProps)(Navbar);
+export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
