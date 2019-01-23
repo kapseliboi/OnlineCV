@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
 import ProjectElement from "../project/ProjectElement";
+import Modal from "../utils/Modal";
 import { moveProjectUp, moveProjectDown, deleteProject } from "../../actions/dataActions";
 
 function mapDispatchToProps(dispatch) {
@@ -42,19 +43,26 @@ class Projects extends Component {
     this.setState({toRemove: index});
   }
 
+  onRemoval = () => {
+    this.props.deleteProject(this.state.toRemove);
+    this.setState({toRemove: null});
+  }
+
 
   render () {
-    const header = "";
-    console.log(this.props.projects);
     return (
       <main className="py-md-4 pl-md-5">
+        <Modal title="Confirm remove action" target={this.state.toRemove !== null ?
+        this.props.projects[this.state.toRemove].title : ""}
+        confirm={this.onRemoval} />
         <h1>Your projects</h1>
         <div className="container-fluid my-2">
           {this.props.projects.map((project, i) =>
-            <ProjectElement key={this.props.projects[i].id}
-            name={this.props.projects[i].title}
+            <ProjectElement key={project.id}
+            name={project.title}
             moveUp={this.props.moveProjectUp}
             moveDown={this.props.moveProjectDown}
+            setRemoved={this.setToBeRemoved}
             index={i} moving={this.props.moving} />
           )}
         </div>
@@ -72,11 +80,11 @@ class Projects extends Component {
             <div className="form-group col-md-6">
               <label htmlFor="headerCurrent">Current header</label>
               <span className="form-control-plaintext"
-              id="headerCurrent">{header}</span>
+              id="headerCurrent">{this.state.header}</span>
             </div>
           </div>
           <div className="form-row">
-            <button type="submit" className="btn btn-lg btn-primary">Save</button>
+            <button type="submit" className="btn btn-lg btn-primary">Save header</button>
           </div>
         </form>
       </main>
