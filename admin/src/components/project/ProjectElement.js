@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
+
 const ProjectElement = props => {
   return (
     <div className="row">
@@ -18,7 +19,7 @@ const ProjectElement = props => {
             disabled={props.index===props.length-1 || props.moving}
             onClick={() => props.moveDown(props.index)}>&#8595;</button>
 
-            <Link className="btn btn-primary mx-1" to={"/projects/" + props.id}
+            <Link className="btn btn-primary mx-1" to={"/projects/edit/" + props.index}
             disabled={props.moving}>Edit</Link>
 
             <button className="btn btn-danger mx-1" type="button"
