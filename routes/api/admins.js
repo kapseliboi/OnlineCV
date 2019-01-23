@@ -5,6 +5,7 @@ const multer = require("multer");
 const path = require("path");
 
 const Project = require("../../models/Project");
+const parseForm = require("../../utils/parseForm");
 
 router.use(passport.authenticate("jwt", {session: false}));
 
@@ -35,73 +36,10 @@ router.post("/projects/create", upload, (req, res) => {
     });
   }
 
-  var countPromise = Project.count({ owner: req.user.id }).exec();
+  var countPromise = Project.countDocuments({ owner: req.user.id }).exec();
 
-  var content = [];
-  var imgIndex = 0;
-  var textIndex = 0;
+  const content = parseForm(req.body);
 
-  // If we have multiple images or text objects
-  if (Array.isArray(req.body.type)){
-    for (var i = 0; i < req.body.type.length; i++) {
-      if (req.body.type[i] === "image") {
-        // If we have multiple images
-        if (Array.isArray(req.body.description)){
-          content.push({
-            type: req.body.type[i],
-            description: req.body.description[imgIndex],
-            caption: req.body.caption[imgIndex],
-            url: req.files[imgIndex].path
-          });
-          imgIndex++;
-        }
-        // Single image but at least one text object
-        else {
-          content.push({
-            type: req.body.type[i],
-            description: req.body.description,
-            caption: req.body.caption,
-            url: req.files[0].path
-          })
-        }
-      }
-      else {
-        // If we have multiple texts
-        if (Array.isArray(req.body.text)){
-          content.push({
-            type: req.body.type[i],
-            text: req.body.text[textIndex]
-          });
-          textIndex++;
-        }
-        // Single text but at least one image
-        else {
-          content.push({
-            type: req.body.type[i],
-            text: req.body.text
-          });
-        }
-      }
-    }
-  }
-  else {
-    // Only one image or one text
-    if (req.body.type === "image") {
-      content.push({
-        type: req.body.type,
-        description: req.body.description,
-        caption: req.body.caption,
-        url: req.files[0].path
-      });
-    }
-    else {
-      content.push({
-        type: req.body.type,
-        text: req.body.text
-      });
-    }
-  }
-  console.log(content);
   countPromise.then((count) => {
     const newProject = new Project({
       title: req.body.title,
@@ -111,10 +49,13 @@ router.post("/projects/create", upload, (req, res) => {
     });
     newProject.save((err, project) => {
       if (err) {
-        console.log(err);
+        return res.status(400).json(err);
       }
       else {
-        res.json({success: true});
+        const imgURLs = req.files.map( img => {
+          return img.path;
+        });
+        res.json({success: true, imgURLS: imgURLs});
       }
     });
   }).catch( err => {
@@ -123,6 +64,26 @@ router.post("/projects/create", upload, (req, res) => {
       return res.status(500).json({error: "Something went wrong, please try again later."});
     }
   });
+});
+
+router.post("/projects/update", upload, (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({
+      error: "Not an admin"
+    });
+  }
+  const content = parseForm(req.body);
+  Project.updateOne({position: req.body.index, owner: req.user.id},
+    {title: req.body.title, content: content}, (err, raw) => {
+      if (err) {
+        return res.status(500).json({error: "Something went wrong, please try again."});
+      }
+      const imgURLs = req.files.map( img => {
+        return img.path;
+      });
+      console.log("Update succesful");
+      res.json({success: true, imgURLS: imgURLs});
+    });
 });
 
 router.get("/startdata", (req, res) => {
@@ -134,9 +95,7 @@ router.get("/startdata", (req, res) => {
   Project.find({owner: req.user.id}, "-_id content title").sort("position").then(
     (projects) => {
 
-    console.log(projects);
-    console.log(req.user);
-    res.json({success: true, projects: projects, user: req.user});
+    res.json({projects: projects, user: req.user});
     }
   ).catch( err => {
     if (err) {
@@ -167,7 +126,7 @@ router.post("/projects/moveUp", (req, res) => {
       project.position = req.body.index-1;
       project2.save();
       project.save();
-      return res.json({success: true});
+      return res.json();
     });
   });
 
@@ -191,10 +150,33 @@ router.post("/projects/moveDown", (req, res) => {
       project.position = req.body.index+1;
       project2.save();
       project.save();
-      return res.json({success: true});
+      return res.json();
     });
   });
 
+});
+
+router.post("/projects/delete", (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({
+      error: "Not an admin"
+    });
+  }
+  Project.deleteOne({position: req.body.index}, (err, result) => {
+    if (err) {
+      return res.status(500).json({error: "Something went wrong."});
+    }
+    else if (!result) {
+      return res.status(400).json({error: "Project wasn't found."});
+    }
+    Project.updateMany({position: {$gt: req.body.index}}, {$inc: {position: -1}},
+      (err) => {
+      if (err) {
+        return res.status(500).json({error: "Something went wrong."});
+      }
+      return res.json();
+    });
+  });
 });
 
 module.exports = router;
