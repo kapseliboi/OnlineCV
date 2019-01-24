@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { getCSRFToken } from "./actions/authActions";
+import { getStartData } from "./actions/globalActions";
 import Navbar from "./components/layout/Navbar";
 import Landing from "./components/layout/Landing";
 import Projects from "./components/layout/Projects";
@@ -12,13 +12,13 @@ require ('./App.css');
 
 function mapDispatchToProps(dispatch) {
   return {
-    getCSRFToken: () => dispatch(getCSRFToken())
+    getStartData: () => dispatch(getStartData())
   }
 }
 
 class App extends Component {
   componentDidMount() {
-    this.props.getCSRFToken();
+    this.props.getStartData();
   }
 
   render() {
