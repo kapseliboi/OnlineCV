@@ -1,46 +1,71 @@
-module.exports = parseForm = (data) => {
+module.exports = parseForm = (req) => {
   var content = [];
   var imgIndex = 0;
   var textIndex = 0;
+  var imgURLs = [];
 
   // If we have multiple images or text objects
-  if (Array.isArray(data.type)){
-    for (var i = 0; i < data.type.length; i++) {
-      if (data.type[i] === "image") {
+  if (Array.isArray(req.body.type)){
+    for (var i = 0; i < req.body.type.length; i++) {
+      if (req.body.type[i] === "image") {
         // If we have multiple images
-        if (Array.isArray(data.description)){
-          content.push({
-            type: data.type[i],
-            description: data.description[imgIndex],
-            caption: data.caption[imgIndex],
-            url: req.files[imgIndex].path
-          });
+        if (Array.isArray(req.body.description)){
+          if (req.body.url[imgIndex] !== "null") {
+            content.push({
+              type: req.body.type[i],
+              description: req.body.description[imgIndex],
+              caption: req.body.caption[imgIndex],
+              url: req.body.url[imgIndex]
+            });
+            imgURLs.push(req.body.url[imgIndex]);
+          }
+          else {
+            content.push({
+              type: req.body.type[i],
+              description: req.body.description[imgIndex],
+              caption: req.body.caption[imgIndex],
+              url: req.files[imgIndex].path
+            });
+            imgURLs.push(req.files[imgIndex].path);
+          }
           imgIndex++;
         }
-        // Single image but at least one text object
+        // Single image and at least one text object
         else {
-          content.push({
-            type: data.type[i],
-            description: data.description,
-            caption: data.caption,
-            url: req.files[0].path
-          })
+          if (req.body.url !== "null") {
+            content.push({
+              type: req.body.type[i],
+              description: req.body.description,
+              caption: req.body.caption,
+              url: req.body.url
+            });
+            imgURLs.push(req.body.url);
+          }
+          else {
+            content.push({
+              type: req.body.type[i],
+              description: req.body.description,
+              caption: req.body.caption,
+              url: req.files[0].path
+            });
+            imgURLs.push(req.files[0].path);
+          }
         }
       }
       else {
         // If we have multiple texts
-        if (Array.isArray(data.text)){
+        if (Array.isArray(req.body.text)){
           content.push({
-            type: data.type[i],
-            text: data.text[textIndex]
+            type: req.body.type[i],
+            text: req.body.text[textIndex]
           });
           textIndex++;
         }
-        // Single text but at least one image
+        // Single text and at least one image
         else {
           content.push({
-            type: data.type[i],
-            text: data.text
+            type: req.body.type[i],
+            text: req.body.text
           });
         }
       }
@@ -48,20 +73,33 @@ module.exports = parseForm = (data) => {
   }
   else {
     // Only one image or one text
-    if (data.type === "image") {
-      content.push({
-        type: data.type,
-        description: data.description,
-        caption: data.caption,
-        url: req.files[0].path
-      });
+    if (req.body.type === "image") {
+      if (req.body.url !== "null") {
+        content.push({
+          type: req.body.type,
+          description: req.body.description,
+          caption: req.body.caption,
+          url: req.body.url
+        });
+        imgURLs.push(req.body.url);
+      }
+      else {
+        content.push({
+          type: req.body.type,
+          description: req.body.description,
+          caption: req.body.caption,
+          url: req.files[0].path
+        });
+        imgURLs.push(req.files[0].path);
+      }
     }
-    else if (data.type) {
+    // Only header
+    else if (req.body.type) {
       content.push({
-        type: data.type,
-        text: data.text
+        type: req.body.type,
+        text: req.body.text
       });
     }
   }
-  return content;
+  return {content: content, imgURLs: imgURLs};
 }
