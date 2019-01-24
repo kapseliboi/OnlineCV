@@ -3,26 +3,20 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { logoutUser } from "../../actions/authActions";
-import { getStartData } from "../../actions/dataActions";
 
 function mapDispatchToProps(dispatch) {
   return {
-    logoutUser: () => dispatch(logoutUser()),
-    getStartData: () => dispatch(getStartData())
+    logoutUser: () => dispatch(logoutUser())
   };
 }
 
 const mapStateToProps = (state) => {
   return {
-    user: state.data.user
+    user: state.global.user
   };
 };
 
 class Navbar extends Component {
-  componentDidMount () {
-    this.props.getStartData();
-  }
-
   onLogoutClicked = () => {
     this.props.logoutUser();
   }
