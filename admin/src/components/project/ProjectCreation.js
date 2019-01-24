@@ -5,19 +5,19 @@ import { connect } from "react-redux";
 import ImageField from "../utils/ImageField";
 import TextField from "../utils/TextField";
 import Modal from "../utils/Modal";
-import {createOrUpdateProject} from "../../actions/dataActions";
+import {createOrUpdateProject} from "../../actions/projectActions";
 
 function mapDispatchToProps(dispatch) {
   return {
-    createOrUpdateProject: (formData, title, history, index) => dispatch(
-      createOrUpdateProject(formData, title, history, index))
+    createOrUpdateProject: (formData, title, history, index, removedImgs) => dispatch(
+      createOrUpdateProject(formData, title, history, index, removedImgs))
   };
 }
 
 const mapStateToProps = state => {
   return {
-    loading: state.data.creating,
-    projects: state.data.projects
+    loading: state.project.creating,
+    projects: state.project.projects
   };
 };
 
@@ -49,7 +49,8 @@ class ProjectCreation extends Component {
       content: newContent,
       id: id,
       toRemove: null,
-      edit: edit
+      edit: edit,
+      removedImages: []
     };
   }
 
@@ -57,11 +58,11 @@ class ProjectCreation extends Component {
     event.preventDefault();
     if (this.state.edit) {
       this.props.createOrUpdateProject(this.state.content, this.state.title,
-        this.props.history, this.props.match.params.index);
+        this.props.history, this.props.match.params.index, this.state.removedImages);
     }
     else {
       this.props.createOrUpdateProject(this.state.content, this.state.title,
-        this.props.history, null);
+        this.props.history, null, null);
     }
   };
 
@@ -85,7 +86,15 @@ class ProjectCreation extends Component {
   onImageChange = (i, event) => {
     const newContent = this.state.content.slice();
     newContent[i].file = event.target.files[0];
-    this.setState({ content: newContent });
+    if (newContent[i].url && this.state.removedImages.indexOf(newContent[i].url) === -1) {
+      this.setState({
+        content: newContent,
+        removedImages: this.state.removedImages.concat(newContent[i].url)
+      });
+    }
+    else {
+      this.setState({ content: newContent });
+    }
   };
 
   addImageField = () => {
@@ -138,7 +147,17 @@ class ProjectCreation extends Component {
   onRemoval = () => {
     var newContent = this.state.content.slice();
     newContent.splice(this.state.toRemove, 1);
-    this.setState({ content: newContent, toRemove: null });
+    if (this.state.content[this.state.toRemove].url) {
+      const removedURL = this.state.content[this.state.toRemove].url;
+      this.setState({
+        content: newContent,
+        toRemove: null,
+        removedImages: this.state.removedImages.concat(removedURL)
+      });
+    }
+    else {
+      this.setState({ content: newContent, toRemove: null });
+    }
   }
 
 
