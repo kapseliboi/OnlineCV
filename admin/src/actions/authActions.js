@@ -1,6 +1,5 @@
 import axios from "axios";
 
-import setAuthToken from "../utils/setAuthToken";
 import {
   GET_LOGIN_ERRORS,
   GET_REGISTER_ERRORS,
@@ -28,14 +27,6 @@ export const registerUser = (userData, history) => dispatch => {
   );
 };
 
-export const getCSRFToken = () => dispatch => {
-  axios.get("/api/csrftoken").then(
-    res => {
-      const { csrftoken } = res.data;
-      axios.defaults.headers.common["csrf-token"] = csrftoken;
-    }
-  );
-};
 
 export const getUser = () => dispatch => {
   // dispatch({
