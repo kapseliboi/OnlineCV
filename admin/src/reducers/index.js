@@ -1,11 +1,13 @@
 import { combineReducers } from "redux";
 import authReducer from "./authReducers";
 import {loginErrorReducer, registerErrorReducer} from "./errorReducers";
-import dataReducer from "./dataReducers";
+import projectReducer from "./projectReducers";
+import globalReducer from "./globalReducer";
 
 export default combineReducers({
   auth: authReducer,
   loginErrors: loginErrorReducer,
   registerErrors: registerErrorReducer,
-  data: dataReducer
+  project: projectReducer,
+  global: globalReducer
 });
