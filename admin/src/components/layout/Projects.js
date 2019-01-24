@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 import ProjectElement from "../project/ProjectElement";
 import Modal from "../utils/Modal";
-import { moveProjectUp, moveProjectDown, deleteProject } from "../../actions/dataActions";
+import { moveProjectUp, moveProjectDown, deleteProject } from "../../actions/projectActions";
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -17,8 +17,8 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = state => {
   return {
-    projects: state.data.projects,
-    moving: state.data.moving
+    projects: state.project.projects,
+    moving: state.project.moving
   };
 };
 
