@@ -4,9 +4,14 @@ const passport = require("passport");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const generator = require("generate-password");
+const bcrypt = require("bcryptjs");
 
 const Project = require("../../models/Project");
+const Application = require("../../models/Project");
+const User = require("../../models/User");
 const parseForm = require("../../utils/parseForm");
+const validateRegisterInput = require("../../validation/register");
 
 router.use(passport.authenticate("jwt", {session: false}));
 
@@ -103,16 +108,42 @@ router.get("/startdata", (req, res) => {
       error: "Not an admin"
     });
   }
-  Project.find({owner: req.user.id}, "-_id content title").sort("position").then(
-    (projects) => {
 
-    res.json({projects: projects, user: req.user});
-    }
-  ).catch( err => {
-    if (err) {
-      console.log(err);
-      res.status(500).json({error: "Something went wrong, please try again later."});
-    }
+  var resData = {user: req.user};
+
+  Promise.all([
+    Project.find({owner: req.user.id}, "-_id content title").sort("position"),
+    User.aggregate().match({
+      isAdmin: false
+    }).lookup({
+      from: "Application",
+      localField: "_id",
+      foreignField: "target",
+      as: "application"
+    }).project({
+      "_id": 0,
+      "name": 1,
+      "username": 1,
+      "application.content": {
+        $filter: {
+          input:"$application",
+          as: "application_field",
+          cond: {
+            $eq: ["$$application_field.owner", req.user.id]
+          }
+        }
+      }
+    })
+    ]).then( ([projects, users]) => {
+      console.log(users);
+    return res.json({
+      projects: projects,
+      users: users,
+      user: req.user
+    });
+  }).catch( err => {
+    console.log(err);
+    return res.status(500).json({error: "Something went wrong."});
   });
 });
 
@@ -202,5 +233,70 @@ router.post("/projects/delete", (req, res) => {
     });
   });
 });
+
+// Register route
+router.post("/registerUser", (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({
+      error: "Not an admin"
+    });
+  }
+  const { errors, isValid } = validateRegisterInput(req.body);
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+  User.findOne({ username: req.body.username }, (err, user) => {
+    if (user) {
+      return res.status(400).json({ username: "Username already exists." });
+    }
+    const newPassword = generator.generate({ length: 20, numbers: true });
+    const newUser = new User({
+      name: req.body.name,
+      username: req.body.username,
+      password: newPassword
+    });
+
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(newUser.password, salt, (err, hash) => {
+        if (err) throw err;
+        newUser.password = hash;
+        newUser.save( (err, user) => {
+          if (err) {
+            console.log(err);
+          }
+          else {
+            res.json({ password: newPassword });
+          }
+        });
+      });
+    });
+  });
+
+});
+
+router.post("/deleteUser", (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({
+      error: "Not an admin"
+    });
+  }
+  if (req.body.username) {
+    User.findOneAndRemove({username: req.body.username, isAdmin: false},
+      {select: "_id"}, (err, user) => {
+      if (err) {
+        return res.status(500).json({error:"Something went wrong."});
+      }
+      else if (!user) {
+        return res.status(400).json({error:"No user found"});
+      }
+      Application.deleteOne({target: user._id}, (err, result) => {
+        if (err) {
+          return res.status(500).json({error:"Something went wrong."});
+        }
+      });
+    });
+    return res.json({});
+  }
+})
 
 module.exports = router;
