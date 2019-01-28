@@ -57,6 +57,9 @@ app.get("/api/csrftoken", (req, res) => {
   res.json({ csrftoken: req.csrfToken() });
 });
 
+app.use("/images", passport.authenticate("jwt", {session: false}),
+express.static("images"));
+
 // Error handling
 app.use((err, req, res, next) => {
   // CSRF
