@@ -8,6 +8,8 @@ import Landing from "./components/layout/Landing";
 import Projects from "./components/layout/Projects";
 import Users from "./components/layout/Users";
 import ProjectCreation from "./components/project/ProjectCreation";
+import Register from "./components/auth/Register";
+import ApplicationCreation from "./components/users/ApplicationCreation";
 require ('./App.css');
 
 function mapDispatchToProps(dispatch) {
@@ -33,6 +35,8 @@ class App extends Component {
             <Route exact path="/users" component={Users} />
             <Route exact path="/projects/add" component={ProjectCreation} />
             <Route exact path="/projects/edit/:index" component={ProjectCreation} />
+            <Route exact path="/users/add" component={Register} />
+            <Route exact path="/users/edit/:username" component={ApplicationCreation} />
           </Switch>
         </div>
       </Router>
