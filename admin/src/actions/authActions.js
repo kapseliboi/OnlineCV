@@ -1,22 +1,28 @@
 import axios from "axios";
 
 import {
-  GET_LOGIN_ERRORS,
   GET_REGISTER_ERRORS,
-  SET_CURRENT_USER,
-  USER_LOADING,
-  NEW_USER_REGISTERED
+  NEW_USER_REGISTERED,
+  GET_NEW_USER
 } from "./types";
 
 // Action creator
 export const registerUser = (userData, history) => dispatch => {
-  axios.post("/api/users/register", userData).then(
+  axios.post("/api/admins/registerUser", userData).then(
     res => {
-      // history.push("login"); // redirect to login if succesful
-      const { newUser } = res.data;
+      const newUser = {
+        name: userData.name,
+        username: userData.username,
+        password: res.data.password
+      };
       dispatch({
         type: NEW_USER_REGISTERED,
         payload: newUser
+      });
+      console.log("GETTING NEW USER");
+      dispatch({
+        type: GET_NEW_USER,
+        payload: {name: userData.name, username: userData.username}
       });
     }
   ).catch(
@@ -27,29 +33,6 @@ export const registerUser = (userData, history) => dispatch => {
   );
 };
 
-
-export const getUser = () => dispatch => {
-  // dispatch({
-  //   type: USER_LOADING
-  // });
-  // axios.post("/api/getcurrentuser", userData).then(
-  //   res => {
-  //     const {payload} = res.data;
-  //     localStorage.setItem("jwtToken", token);
-  //     setAuthToken(token);
-  //     const decoded = jwt_decode(token);
-  //     dispatch({
-  //       type: SET_CURRENT_USER,
-  //       payload: payload
-  //     });
-  //   }
-  // ).catch(
-  //   err => dispatch ({
-  //     type: GET_LOGIN_ERRORS,
-  //     payload: err.response.data
-  //   })
-  // );
-};
 
 export const logoutUser = () => dispatch => {
   axios.post("/api/users/logout").then(
