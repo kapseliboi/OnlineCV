@@ -6,8 +6,7 @@ const initialState = {
   projects: [],
   creating: false,
   moving: false,
-  id: 0,
-  user: {}
+  id: 0
 };
 
 export default function (state = initialState, action) {
