@@ -40,8 +40,17 @@ class Register extends Component {
       name: this.state.name,
       username: this.state.username
     };
-    console.log(newUser);
     this.props.registerUser(newUser);
+  };
+
+  copyPassword = () => {
+    var textArea = document.createElement("textarea");
+    textArea.value = this.props.newUser.password;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
   };
 
 
@@ -82,6 +91,13 @@ class Register extends Component {
             </div>
 
             <button type="submit" className="btn btn-lg btn-primary">Submit</button>
+            {this.props.newUser.password &&
+            <div>
+              <p>Password: {this.props.newUser.password}</p>
+              <button type="button" className="btn btn-lg btn-primary"
+              onClick={this.copyPassword}>Copy password to clipboard</button>
+            </div>
+            }
           </form>
         </div>
       </div>
