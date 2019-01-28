@@ -12,3 +12,6 @@ export const DELETE_PROJECT = "DELETE_PROJECT";
 export const MOVING_PROJECT = "MOVING_PROJECT";
 export const UPDATE_PROJECT = "UPDATE_PROJECT";
 export const GET_ADMIN_DATA = "GET_ADMIN_DATA";
+export const GET_NEW_USER = "GET_NEW_USER";
+export const GET_USER_DATA = "GET_USER_DATA";
+export const USER_REMOVED = "USER_REMOVED";
