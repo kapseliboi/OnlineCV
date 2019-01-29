@@ -6,9 +6,10 @@ const path = require("path");
 const fs = require("fs");
 const generator = require("generate-password");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 
 const Project = require("../../models/Project");
-const Application = require("../../models/Project");
+const Application = require("../../models/Application");
 const User = require("../../models/User");
 const parseForm = require("../../utils/parseForm");
 const validateRegisterInput = require("../../validation/register");
@@ -111,31 +112,40 @@ router.get("/startdata", (req, res) => {
 
   var resData = {user: req.user};
 
+
   Promise.all([
     Project.find({owner: req.user.id}, "-_id content title").sort("position"),
     User.aggregate().match({
       isAdmin: false
     }).lookup({
-      from: "Application",
-      localField: "_id",
-      foreignField: "target",
+      from: "applications",
+      let: {
+        id: "$_id"
+      },
+      pipeline: [
+        {$match: {
+          $expr: {
+            $and:[
+              {$eq: [mongoose.Types.ObjectId(req.user.id), "$owner"]},
+              {$eq: ["$target", "$$id"]}
+            ]
+          }
+        }}
+      ],
       as: "application"
-    }).project({
+    }).unwind("$application").project({
       "_id": 0,
       "name": 1,
       "username": 1,
-      "application.content": {
-        $filter: {
-          input:"$application",
-          as: "application_field",
-          cond: {
-            $eq: ["$$application_field.owner", req.user.id]
-          }
-        }
-      }
+      "application": 1
     })
     ]).then( ([projects, users]) => {
-      console.log(users);
+      for (var i = 0; i < users.length; i++) {
+        delete users[i].application._id;
+        delete users[i].application.target;
+        delete users[i].application.owner;
+        delete users[i].application.__v;
+      }
     return res.json({
       projects: projects,
       users: users,
@@ -297,6 +307,34 @@ router.post("/deleteUser", (req, res) => {
     });
     return res.json({});
   }
-})
+});
+
+router.post("/application", (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(401).json({
+      error: "Not an admin"
+    });
+  }
+  User.findOne({username: req.body.username}, "_id", (err, user) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({error: "Something went wrong."});
+    }
+    else if (!user) {
+      return res.status(400).json({error: "User not found"});
+    }
+    const content = [req.body.titleMe, req.body.textMe ,req.body.titleYou,
+    req.body.textYou]
+    Application.updateOne({owner: req.user.id, target: user._id}, {content: content},
+    {upsert: true}, (err, raw) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({error: "Something went wrong."});
+      }
+      return res.json({});
+    });
+
+  });
+});
 
 module.exports = router;
