@@ -28,6 +28,7 @@ class ApplicationCreation extends Component {
 
   onSubmit = event => {
     event.preventDefault();
+    console.log("pressed");
     const formData = {
       titleMe: this.state.titleMe,
       textMe: this.state.textMe,
@@ -64,7 +65,8 @@ class ApplicationCreation extends Component {
             onChange={this.onChange} value={this.state.textYou}></textarea>
           </div>
         </form>
-        <button type="submit" className="btn btn-lg btn-primary">Save</button>
+        <button type="button" onClick={this.onSubmit}
+        className="btn btn-lg btn-primary">Save</button>
       </main>
   );
   }
