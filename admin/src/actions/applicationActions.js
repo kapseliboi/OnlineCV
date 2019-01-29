@@ -17,6 +17,15 @@ export const deleteUser = username => dispatch => {
   );
 }
 
-export const createOrUpdateApplication = (formData, username, history) => {
+export const createOrUpdateApplication = (formData, username, history) => dispatch => {
+  axios.post("/api/admins/application", {...formData, username: username}).then(
+    res => {
+      console.log("Success");
+      // dispatch({
+      //   type:
+      // })
+    }
+  ).catch(
 
-}
+  );
+};
