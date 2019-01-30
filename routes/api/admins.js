@@ -14,7 +14,22 @@ const User = require("../../models/User");
 const parseForm = require("../../utils/parseForm");
 const validateRegisterInput = require("../../validation/register");
 
-router.use(passport.authenticate("jwt", {session: false}));
+// Admin only authentication
+router.use((req, res, next) => {
+  passport.authenticate("jwt", (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({error: "Not authenticated"});
+    }
+    if (!user.isAdmin) {
+      return res.status(401).json({error: "Not an admin"});
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
+});
 
 function fileFilter(req, file, cb) {
   if (file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
@@ -35,14 +50,6 @@ const upload = multer({ storage: multer.diskStorage({
 }).any();
 
 router.post("/projects/create", upload, (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(401).json({
-      error: "Not an admin"
-    });
-  }
-
-  console.log(req.files);
-
   var countPromise = Project.countDocuments({ owner: req.user.id }).exec();
 
   const {content, imgURLs} = parseForm(req);
@@ -71,12 +78,6 @@ router.post("/projects/create", upload, (req, res) => {
 });
 
 router.post("/projects/update", upload, (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(401).json({
-      error: "Not an admin"
-    });
-  }
-
   if (req.body.removedImg){
     if (Array.isArray(req.body.removedImg)){
       for (var i = 0; i < req.body.removedImg.length; i++){
@@ -104,11 +105,6 @@ router.post("/projects/update", upload, (req, res) => {
 });
 
 router.get("/startdata", (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(401).json({
-      error: "Not an admin"
-    });
-  }
 
   var resData = {user: req.user};
 
@@ -158,11 +154,6 @@ router.get("/startdata", (req, res) => {
 });
 
 router.post("/projects/moveUp", (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(401).json({
-      error: "Not an admin"
-    });
-  }
   Project.findOne({position: req.body.index, owner: req.user.id}, (err, project) => {
     if (err || !project) {
       console.log(err);
@@ -186,11 +177,6 @@ router.post("/projects/moveUp", (req, res) => {
 });
 
 router.post("/projects/moveDown", (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(401).json({
-      error: "Not an admin"
-    });
-  }
   Project.findOne({position: req.body.index, owner: req.user.id}, (err, project) => {
     if (err || !project) {
       return res.status(500).json({error: "Something went wrong."});
@@ -211,11 +197,6 @@ router.post("/projects/moveDown", (req, res) => {
 });
 
 router.post("/projects/delete", (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(401).json({
-      error: "Not an admin"
-    });
-  }
   Project.findOne({position: req.body.index, owner: req.user.id}, (err, project) => {
     if (err) {
       return res.status(500).json({error: "Something went wrong."});
@@ -246,11 +227,6 @@ router.post("/projects/delete", (req, res) => {
 
 // Register route
 router.post("/registerUser", (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(401).json({
-      error: "Not an admin"
-    });
-  }
   const { errors, isValid } = validateRegisterInput(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
@@ -285,11 +261,6 @@ router.post("/registerUser", (req, res) => {
 });
 
 router.post("/deleteUser", (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(401).json({
-      error: "Not an admin"
-    });
-  }
   if (req.body.username) {
     User.findOneAndRemove({username: req.body.username, isAdmin: false},
       {select: "_id"}, (err, user) => {
@@ -310,11 +281,6 @@ router.post("/deleteUser", (req, res) => {
 });
 
 router.post("/application", (req, res) => {
-  if (!req.user.isAdmin) {
-    return res.status(401).json({
-      error: "Not an admin"
-    });
-  }
   User.findOne({username: req.body.username}, "_id", (err, user) => {
     if (err) {
       console.log(err);
