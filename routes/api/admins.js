@@ -302,7 +302,7 @@ router.post("/application", (req, res) => {
       return res.status(400).json({error: "User not found"});
     }
     const content = [req.body.titleMe, req.body.textMe ,req.body.titleYou,
-    req.body.textYou]
+    req.body.textYou];
     Application.updateOne({owner: req.user.id, target: user._id}, {content: content},
     {upsert: true}, (err, raw) => {
       if (err) {
