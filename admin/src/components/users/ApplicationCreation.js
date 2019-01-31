@@ -11,15 +11,46 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
+const mapStateToProps = state => {
+  return {
+    users: state.application.users
+  };
+};
+
 class ApplicationCreation extends Component {
   constructor (props) {
     super(props);
+    if (this.props.users) {
+      const user = this.props.users.find((user) => {
+        return user.username === this.props.match.params.username;
+      });
+      if (user) {
+        if (user.application && user.application.content.length === 4) {
+          this.state = {
+            titleMe: user.application.content[0],
+            textMe: user.application.content[1],
+            titleYou: user.application.content[2],
+            textYou: user.application.content[3]
+          };
+        }
+        else {
+          this.state = {
+            titleMe: "",
+            textMe: "",
+            titleYou: "",
+            textYou: ""
+          };
+        }
+        return;
+      }
+    }
+    this.props.history.push("/users");
     this.state = {
       titleMe: "",
       textMe: "",
       titleYou: "",
       textYou: ""
-    }
+    };
   }
 
   onChange = event => {
@@ -28,7 +59,6 @@ class ApplicationCreation extends Component {
 
   onSubmit = event => {
     event.preventDefault();
-    console.log("pressed");
     const formData = {
       titleMe: this.state.titleMe,
       textMe: this.state.textMe,
@@ -72,4 +102,4 @@ class ApplicationCreation extends Component {
   }
 }
 
-export default connect(null, mapDispatchToProps)(withRouter(ApplicationCreation));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ApplicationCreation));
