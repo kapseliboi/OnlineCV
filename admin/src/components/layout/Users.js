@@ -4,18 +4,20 @@ import { Link } from "react-router-dom";
 
 import Modal from "../utils/Modal";
 import UserElement from "../users/UserElement";
-import { deleteUser } from "../../actions/applicationActions";
+import { deleteUser, updateApplicationHeader } from "../../actions/applicationActions";
 
 function mapDispatchToProps(dispatch) {
   return {
-    deleteUser: (username) => dispatch(deleteUser(username))
+    deleteUser: (username) => dispatch(deleteUser(username)),
+    updateHeader: (header) => dispatch(updateApplicationHeader(header))
   };
 }
 
 const mapStateToProps = state => {
   return {
     users: state.application.users,
-    changing: state.application.changing
+    changing: state.application.changing,
+    header: state.application.header
   };
 };
 
@@ -35,6 +37,7 @@ class Users extends Component {
 
   onSubmit = event => {
     event.preventDefault();
+    this.props.updateHeader(this.state.header);
   };
 
   setToBeRemoved = (username) => {
@@ -69,13 +72,13 @@ class Users extends Component {
           <div className="form-row">
             <div className="form-group col-md-6">
               <label htmlFor="inputHeader">Header shown to users</label>
-              <input type="text" className="form-control" id="inputHeader"
+              <input type="text" className="form-control" id="header"
               placeholder="Header" onChange={this.onChange} value={this.state.header}/>
             </div>
             <div className="form-group col-md-6">
               <label htmlFor="headerCurrent">Current header</label>
               <span className="form-control-plaintext"
-              id="headerCurrent">{this.state.header}</span>
+              id="headerCurrent">{this.props.header}</span>
             </div>
           </div>
           <div className="form-row">
