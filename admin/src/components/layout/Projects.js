@@ -5,20 +5,23 @@ import { Link } from "react-router-dom";
 
 import ProjectElement from "../project/ProjectElement";
 import Modal from "../utils/Modal";
-import { moveProjectUp, moveProjectDown, deleteProject } from "../../actions/projectActions";
+import { moveProjectUp, moveProjectDown, deleteProject, updateProjectHeader }
+from "../../actions/projectActions";
 
 function mapDispatchToProps(dispatch) {
   return {
     moveProjectUp: (index) => dispatch(moveProjectUp(index)),
     moveProjectDown: (index) => dispatch(moveProjectDown(index)),
-    deleteProject: (index) => dispatch(deleteProject(index))
+    deleteProject: (index) => dispatch(deleteProject(index)),
+    updateHeader: (header) => dispatch(updateProjectHeader(header))
   };
 }
 
 const mapStateToProps = state => {
   return {
     projects: state.project.projects,
-    moving: state.project.moving
+    moving: state.project.moving,
+    header: state.project.header
   };
 };
 
@@ -37,6 +40,7 @@ class Projects extends Component {
 
   onSubmit = event => {
     event.preventDefault();
+    this.props.updateHeader(this.state.header);
   };
 
   setToBeRemoved = (index) => {
@@ -63,7 +67,8 @@ class Projects extends Component {
             moveUp={this.props.moveProjectUp}
             moveDown={this.props.moveProjectDown}
             setRemoved={this.setToBeRemoved}
-            index={i} moving={this.props.moving} />
+            index={i} moving={this.props.moving}
+            length={this.props.projects.length} />
           )}
         </div>
         <Link to="/projects/add"
@@ -74,13 +79,13 @@ class Projects extends Component {
           <div className="form-row">
             <div className="form-group col-md-6">
               <label htmlFor="inputHeader">Header shown to users</label>
-              <input type="text" className="form-control" id="inputHeader"
+              <input type="text" className="form-control" id="header"
               placeholder="Header" onChange={this.onChange} value={this.state.header}/>
             </div>
             <div className="form-group col-md-6">
               <label htmlFor="headerCurrent">Current header</label>
               <span className="form-control-plaintext"
-              id="headerCurrent">{this.state.header}</span>
+              id="headerCurrent">{this.props.header}</span>
             </div>
           </div>
           <div className="form-row">
