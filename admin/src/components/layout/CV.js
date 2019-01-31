@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 
-class Landing extends Component {
+class CV extends Component {
   render () {
     return (
       <div>
@@ -11,4 +11,4 @@ class Landing extends Component {
   }
 }
 
-export default Landing;
+export default CV;
