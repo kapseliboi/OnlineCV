@@ -11,6 +11,7 @@ const mongoose = require("mongoose");
 const Project = require("../../models/Project");
 const Application = require("../../models/Application");
 const User = require("../../models/User");
+const Headers = require("../../models/Headers");
 const parseForm = require("../../utils/parseForm");
 const validateRegisterInput = require("../../validation/register");
 
@@ -129,23 +130,30 @@ router.get("/startdata", (req, res) => {
         }}
       ],
       as: "application"
-    }).unwind("$application").project({
+    }).unwind({
+      path: "$application",
+      preserveNullAndEmptyArrays: true
+    }).project({
       "_id": 0,
       "name": 1,
       "username": 1,
       "application": 1
-    })
-    ]).then( ([projects, users]) => {
+    }),
+    Headers.findOne({owner: req.user.id}, "-_id")
+    ]).then( ([projects, users, headers]) => {
       for (var i = 0; i < users.length; i++) {
-        delete users[i].application._id;
-        delete users[i].application.target;
-        delete users[i].application.owner;
-        delete users[i].application.__v;
+        if (users[i].hasOwnProperty("application")) {
+          delete users[i].application._id;
+          delete users[i].application.target;
+          delete users[i].application.owner;
+          delete users[i].application.__v;
+        }
       }
     return res.json({
       projects: projects,
       users: users,
-      user: req.user
+      user: req.user,
+      headers: headers
     });
   }).catch( err => {
     console.log(err);
@@ -281,6 +289,10 @@ router.post("/deleteUser", (req, res) => {
 });
 
 router.post("/application", (req, res) => {
+  if (!req.body.hasOwnProperty("titleMe") || !req.body.hasOwnProperty("textMe")
+  || !req.body.hasOwnProperty("titleYou") || !req.body.textYou){
+    return res.status(400).json({error: "Bad request"});
+  }
   User.findOne({username: req.body.username}, "_id", (err, user) => {
     if (err) {
       console.log(err);
@@ -300,6 +312,26 @@ router.post("/application", (req, res) => {
       return res.json({});
     });
 
+  });
+});
+
+router.post("/headers", (req, res) => {
+  var headers = {owner: req.user.id};
+  if (req.body.hasOwnProperty("cv")) {
+    headers.cv = req.body.cv;
+  }
+  if (req.body.hasOwnProperty("projects")) {
+    headers.projects = req.body.projects;
+  }
+  if (req.body.hasOwnProperty("applications")) {
+    headers.applications = req.body.applications;
+  }
+  Headers.updateOne({owner: req.user.id}, headers, {upsert: true}, (err, raw) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({error: "Something went wrong."});
+    }
+    return res.json({});
   });
 });
 
