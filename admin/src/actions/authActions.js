@@ -19,7 +19,6 @@ export const registerUser = (userData, history) => dispatch => {
         type: NEW_USER_REGISTERED,
         payload: newUser
       });
-      console.log("GETTING NEW USER");
       dispatch({
         type: GET_NEW_USER,
         payload: {name: userData.name, username: userData.username}
