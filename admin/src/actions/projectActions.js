@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { CREATING_PROJECT, CREATE_PROJECT, MOVE_PROJECT_UP, MOVE_PROJECT_DOWN,
-  DELETE_PROJECT, MOVING_PROJECT, UPDATE_PROJECT }
+  DELETE_PROJECT, MOVING_PROJECT, UPDATE_PROJECT, PROJECTS_HEADER }
 from "./types";
 
 
@@ -107,6 +107,21 @@ export const deleteProject = (index) => dispatch => {
   ).catch(
     err => {
       // TODO
+    }
+  );
+};
+
+export const updateProjectHeader = header => dispatch => {
+  axios.post("/api/admins/headers", {projects: header}).then(
+    res => {
+      dispatch({
+        type: PROJECTS_HEADER,
+        payload: header
+      });
+    }
+  ).catch(
+    err => {
+      console.log(err);
     }
   );
 };
