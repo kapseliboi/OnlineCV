@@ -1,12 +1,14 @@
 import { GET_PROJECT_DATA, CREATE_PROJECT, CREATING_PROJECT, MOVE_PROJECT_UP,
-  MOVE_PROJECT_DOWN, DELETE_PROJECT, MOVING_PROJECT, UPDATE_PROJECT }
+  MOVE_PROJECT_DOWN, DELETE_PROJECT, MOVING_PROJECT, UPDATE_PROJECT,
+PROJECTS_HEADER }
 from "../actions/types";
 
 const initialState = {
   projects: [],
   creating: false,
   moving: false,
-  id: 0
+  id: 0,
+  header: ""
 };
 
 export default function (state = initialState, action) {
@@ -83,6 +85,12 @@ export default function (state = initialState, action) {
         ...state,
         projects: projects,
         id: id
+      };
+
+    case PROJECTS_HEADER:
+      return {
+        ...state,
+        header: action.payload
       };
 
     default:
