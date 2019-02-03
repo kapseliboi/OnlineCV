@@ -9,7 +9,9 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 
 const users = require("./routes/api/users");
-const admins = require("./routes/api/admins");
+const adminsGeneral = require("./routes/api/admins/general");
+const adminsProjects = require("./routes/api/admins/projects");
+const adminsApplications = require("./routes/api/admins/applicationsAndUsers");
 
 const app = express();
 
@@ -50,7 +52,9 @@ app.use(csrf({ cookie: { httpOnly: true } }));
 
 // Routes
 app.use("/api/users", users);
-app.use("/api/admins", admins);
+app.use("/api/admins", adminsGeneral);
+app.use("/api/admins", adminsApplications);
+app.use("/api/admins/projects", adminsProjects);
 
 
 app.get("/api/csrftoken", (req, res) => {
