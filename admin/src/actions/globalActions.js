@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { GET_PROJECT_DATA, GET_ADMIN_DATA, GET_USER_DATA, PROJECTS_HEADER,
-APPLICATIONS_HEADER } from "./types";
+APPLICATIONS_HEADER, CV_HEADER, GET_CV_DATA } from "./types";
 
 export const getStartData = () => dispatch => {
   axios.get("/api/admins/startdata", {withCredentials: true}).then(
@@ -9,8 +9,12 @@ export const getStartData = () => dispatch => {
       dispatch({type: GET_PROJECT_DATA, payload: res.data.projects});
       dispatch({type: GET_ADMIN_DATA, payload: res.data.user});
       dispatch({type: GET_USER_DATA, payload: res.data.users});
+      dispatch({type: GET_CV_DATA, payload: res.data.cv});
       if (res.data.headers.cv) {
-
+        dispatch({
+          type: CV_HEADER,
+          payload: res.data.headers.cv
+        });
       }
       if (res.data.headers.projects) {
         dispatch({
