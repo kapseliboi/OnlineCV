@@ -4,6 +4,7 @@ import {loginErrorReducer, registerErrorReducer} from "./errorReducers";
 import projectReducer from "./projectReducers";
 import globalReducer from "./globalReducer";
 import applicationReducer from "./applicationReducer";
+import cvReducer from "./cvReducer";
 
 export default combineReducers({
   auth: authReducer,
@@ -11,5 +12,6 @@ export default combineReducers({
   registerErrors: registerErrorReducer,
   project: projectReducer,
   global: globalReducer,
-  application: applicationReducer
+  application: applicationReducer,
+  cv: cvReducer
 });
