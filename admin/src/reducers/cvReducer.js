@@ -1,6 +1,8 @@
 import { GET_CV_DATA, CV_HEADER, ADD_TECHNOLOGY, MOVE_TECH_UP, MOVE_TECH_DOWN,
 SAVE_TECH_CLIENT, DELETE_TECH_CLIENT, ADD_LANGUAGE, MOVE_LANG_UP, MOVE_LANG_DOWN,
-SAVE_LANG_CLIENT, DELETE_LANG_CLIENT }
+SAVE_LANG_CLIENT, DELETE_LANG_CLIENT, ADD_EXPERIENCE, MOVE_EXP_UP, MOVE_EXP_DOWN,
+SAVE_EXP_CLIENT, DELETE_EXP_CLIENT, ADD_EDUCATION, MOVE_EDU_UP, MOVE_EDU_DOWN,
+SAVE_EDU_CLIENT, DELETE_EDU_CLIENT, UPDATE_AVATAR, UPDATE_PERSONAL }
 from "../actions/types";
 
 const initialState = {
@@ -22,6 +24,18 @@ const initialState = {
 
 export default function (state = initialState, action) {
   switch (action.type) {
+    case UPDATE_AVATAR:
+      return {
+        ...state,
+        avatar: action.payload
+      };
+    case UPDATE_PERSONAL:
+      return {
+        ...state,
+        phone: action.payload.phone,
+        email: action.payload.email,
+        description: action.payload.description
+      };
     case GET_CV_DATA:
       var expID = state.expID;
       var eduID = state.eduID;
@@ -163,6 +177,104 @@ export default function (state = initialState, action) {
       return {
         ...state,
         languages: deletedLang
+      };
+    case ADD_EXPERIENCE:
+      return {
+        ...state,
+        experience: state.experience.concat({
+          title: "",
+          employer: "",
+          description: "",
+          start: "",
+          end: "",
+          id: state.expID
+        }),
+        expID: state.expID + 1
+      };
+    case MOVE_EXP_UP:
+      const tempExpUp = state.experience[action.payload - 1];
+      var copyUpExp = state.experience.slice();
+      copyUpExp[action.payload - 1] = copyUpExp[action.payload];
+      copyUpExp[action.payload] = tempExpUp;
+      return {
+        ...state,
+        experience: copyUpExp
+      };
+    case MOVE_EXP_DOWN:
+      const tempExpDown = state.experience[action.payload + 1];
+      var copyDownExp = state.experience.slice();
+      copyDownExp[action.payload + 1] = copyDownExp[action.payload];
+      copyDownExp[action.payload] = tempExpDown;
+      return {
+        ...state,
+        experience: copyDownExp
+      };
+    case SAVE_EXP_CLIENT:
+      var editedExp = state.experience.slice();
+      editedExp[action.payload.index].title = action.payload.title;
+      editedExp[action.payload.index].employer = action.payload.employer;
+      editedExp[action.payload.index].description = action.payload.description;
+      editedExp[action.payload.index].start = action.payload.start;
+      editedExp[action.payload.index].end = action.payload.end;
+      return {
+        ...state,
+        experience: editedExp
+      };
+    case DELETE_EXP_CLIENT:
+      var deletedExp = state.experience.slice();
+      deletedExp.splice(action.payload, 1);
+      return {
+        ...state,
+        experience: deletedExp
+      };
+    case ADD_EDUCATION:
+      return {
+        ...state,
+        education: state.education.concat({
+          title: "",
+          school: "",
+          description: "",
+          start: "",
+          end: "",
+          id: state.eduID
+        }),
+        eduID: state.eduID + 1
+      };
+    case MOVE_EDU_UP:
+      const tempEduUp = state.education[action.payload - 1];
+      var copyUpEdu = state.education.slice();
+      copyUpEdu[action.payload - 1] = copyUpEdu[action.payload];
+      copyUpEdu[action.payload] = tempEduUp;
+      return {
+        ...state,
+        education: copyUpEdu
+      };
+    case MOVE_EDU_DOWN:
+      const tempEduDown = state.education[action.payload + 1];
+      var copyDownEdu = state.education.slice();
+      copyDownEdu[action.payload + 1] = copyDownEdu[action.payload];
+      copyDownEdu[action.payload] = tempEduDown;
+      return {
+        ...state,
+        education: copyDownEdu
+      };
+    case SAVE_EDU_CLIENT:
+      var editedEdu = state.education.slice();
+      editedEdu[action.payload.index].title = action.payload.title;
+      editedEdu[action.payload.index].school = action.payload.school;
+      editedEdu[action.payload.index].description = action.payload.description;
+      editedEdu[action.payload.index].start = action.payload.start;
+      editedEdu[action.payload.index].end = action.payload.end;
+      return {
+        ...state,
+        education: editedEdu
+      };
+    case DELETE_EDU_CLIENT:
+      var deletedEdu = state.education.slice();
+      deletedEdu.splice(action.payload, 1);
+      return {
+        ...state,
+        education: deletedEdu
       };
     default:
       return state;
