@@ -16,7 +16,7 @@ const UserElement = props => {
             disabled={props.changing}>Edit</Link>
 
             <button className="btn btn-danger mx-1" type="button"
-            data-toggle="modal" data-target="#deleteConfirmation"
+            data-toggle="modal" data-target={"#"+props.modal}
             onClick={() => props.setRemoved(props.username)}
             disabled={props.changing}>&#10006;</button>
           </div>

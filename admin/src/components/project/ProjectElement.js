@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const ProjectElement = props => {
   return (
     <div className="row">
-      <div className="col-lg-6 col border border-dark">
+      <div className="col border border-dark">
         <div className="row">
           <div className="col-8 ">
             <span className="form-control-plaintext">{props.name}</span>
@@ -23,7 +23,7 @@ const ProjectElement = props => {
             disabled={props.moving}>Edit</Link>
 
             <button className="btn btn-danger mx-1" type="button"
-            data-toggle="modal" data-target="#deleteConfirmation"
+            data-toggle="modal" data-target={"#"+props.modal}
             onClick={() => props.setRemoved(props.index)}
             disabled={props.moving}>&#10006;</button>
           </div>
