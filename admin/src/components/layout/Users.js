@@ -53,7 +53,7 @@ class Users extends Component {
     return (
       <main className="py-md-4 pl-md-5">
         <Modal title="Confirm remove action" target={this.state.toRemove !== null ?
-        this.state.toRemove : ""}
+        this.state.toRemove : ""} id="deleteConfirmation"
         confirm={this.onRemoval} />
         <h1>Your users</h1>
         <div className="container-fluid my-2">
@@ -61,7 +61,8 @@ class Users extends Component {
             <UserElement key={user.id}
             name={user.name} username={user.username}
             setRemoved={this.setToBeRemoved}
-            changing={this.props.changing} />
+            changing={this.props.changing}
+            modal="deleteConfirmation" />
           )}
         </div>
         <Link to="/users/add"

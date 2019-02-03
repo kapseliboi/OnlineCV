@@ -2,7 +2,7 @@ import React from "react";
 
 const Modal = (props) => {
   return (
-    <div className="modal fade" id="deleteConfirmation" tabIndex="-1" role="dialog">
+    <div className="modal fade" id={props.id} tabIndex="-1" role="dialog">
       <div className="modal-dialog" role="document">
         <div className="modal-content">
           <div className="modal-header">

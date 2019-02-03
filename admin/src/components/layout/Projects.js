@@ -45,19 +45,19 @@ class Projects extends Component {
 
   setToBeRemoved = (index) => {
     this.setState({toRemove: index});
-  }
+  };
 
   onRemoval = () => {
     this.props.deleteProject(this.state.toRemove);
     this.setState({toRemove: null});
-  }
+  };
 
 
   render () {
     return (
       <main className="py-md-4 pl-md-5">
         <Modal title="Confirm remove action" target={this.state.toRemove !== null ?
-        this.props.projects[this.state.toRemove].title : ""}
+        this.props.projects[this.state.toRemove].title : ""} id="deleteConfirmation"
         confirm={this.onRemoval} />
         <h1>Your projects</h1>
         <div className="container-fluid my-2">
@@ -68,7 +68,8 @@ class Projects extends Component {
             moveDown={this.props.moveProjectDown}
             setRemoved={this.setToBeRemoved}
             index={i} moving={this.props.moving}
-            length={this.props.projects.length} />
+            length={this.props.projects.length}
+            modal="deleteConfirmation" />
           )}
         </div>
         <Link to="/projects/add"
