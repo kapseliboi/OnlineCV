@@ -12,6 +12,7 @@ const users = require("./routes/api/users");
 const adminsGeneral = require("./routes/api/admins/general");
 const adminsProjects = require("./routes/api/admins/projects");
 const adminsApplications = require("./routes/api/admins/applicationsAndUsers");
+const cv = require("./routes/api/admins/cv");
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.use("/api/users", users);
 app.use("/api/admins", adminsGeneral);
 app.use("/api/admins", adminsApplications);
 app.use("/api/admins/projects", adminsProjects);
+app.use("/api/admins/cv", cv);
 
 
 app.get("/api/csrftoken", (req, res) => {
