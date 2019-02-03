@@ -20,6 +20,9 @@ const CVSchema = new Schema ({
   avatar: {
     type: String
   },
+  description: {
+    type: String
+  },
 
   experience: [{
     title: {
