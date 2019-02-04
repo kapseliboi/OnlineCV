@@ -1,32 +1,12 @@
 import axios from "axios";
 
-import setAuthToken from "../utils/setAuthToken";
 import {
   GET_LOGIN_ERRORS,
-  GET_REGISTER_ERRORS,
   SET_CURRENT_USER,
   USER_LOADING,
-  NEW_USER_REGISTERED
+  GET_START_DATA
 } from "./types";
 
-// Action creator
-export const registerUser = (userData, history) => dispatch => {
-  axios.post("/api/users/register", userData).then(
-    res => {
-      // history.push("login"); // redirect to login if succesful
-      const { newUser } = res.data;
-      dispatch({
-        type: NEW_USER_REGISTERED,
-        payload: newUser
-      });
-    }
-  ).catch(
-    err => dispatch({   // Action
-      type: GET_REGISTER_ERRORS,
-      payload: err.response.data
-    })
-  );
-};
 
 export const getCSRFToken = () => dispatch => {
   axios.get("/api/csrftoken").then(
@@ -52,15 +32,26 @@ export const loginUser = (userData, history) => dispatch => {
           type: SET_CURRENT_USER,
           payload: payload
         });
+        dispatch({
+          type: GET_START_DATA,
+          headers: res.data.headers,
+          cv: res.data.cv,
+          projects: res.data.projects,
+          application: res.data.application,
+          adminName: res.data.adminName
+        });
         history.push("/home");
       }
     }
   ).catch(
     err => {
       dispatch ({
-      type: GET_LOGIN_ERRORS,
-      payload: err.response.data
-    });
+        type: GET_LOGIN_ERRORS,
+        payload: err.response.data
+      });
+      dispatch({
+        type: SET_CURRENT_USER
+      });
     }
   );
 };
