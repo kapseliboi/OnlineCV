@@ -9,6 +9,7 @@ const initialState = {
   phone: "",
   email: "",
   interests: "",
+  github: "",
   avatar: "",
   description: "",
   experience: [],
@@ -34,7 +35,9 @@ export default function (state = initialState, action) {
         ...state,
         phone: action.payload.phone,
         email: action.payload.email,
-        description: action.payload.description
+        github: action.payload.github,
+        description: action.payload.description,
+        interests: action.payload.interests
       };
     case GET_CV_DATA:
       var expID = state.expID;
