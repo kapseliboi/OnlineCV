@@ -58,7 +58,9 @@ const mapStateToProps = state => {
     education: state.cv.education,
     languages: state.cv.languages,
     technologies: state.cv.technologies,
-    header: state.cv.header
+    header: state.cv.header,
+    github: state.cv.github,
+    interests: state.cv.interests
   };
 };
 
@@ -74,7 +76,9 @@ class CV extends Component {
       langToRemove: null,
       expToRemove: null,
       eduToRemove: null,
-      header: ""
+      header: "",
+      github: "",
+      interests: ""
     };
   }
 
@@ -98,7 +102,9 @@ class CV extends Component {
     this.props.updatePersonal({
       phone: this.state.phone,
       email: this.state.email,
-      description: this.state.description
+      github: this.state.github,
+      description: this.state.description,
+      interests: this.state.interests
     });
   };
 
@@ -112,7 +118,6 @@ class CV extends Component {
   };
 
   updateTechServer = () => {
-    console.log("Called");
     this.props.updateTechServer(this.props.technologies);
   }
 
@@ -166,22 +171,22 @@ class CV extends Component {
 
   render () {
     return (
-      <main className="py-md-4 pl-md-5">
-      <Modal title="Confirm remove action" target={this.state.techToRemove !== null ?
-      this.props.technologies[this.state.techToRemove].name : ""}
-      confirm={this.onTechRemoval} id="techDeleteConfirmation"/>
+      <div className="py-md-4 pl-md-5 container-fluid">
+        <Modal title="Confirm remove action" target={this.state.techToRemove !== null ?
+        this.props.technologies[this.state.techToRemove].name : ""}
+        confirm={this.onTechRemoval} id="techDeleteConfirmation"/>
 
-      <Modal title="Confirm remove action" target={this.state.langToRemove !== null ?
-      this.props.languages[this.state.langToRemove].name : ""}
-      confirm={this.onLangRemoval} id="langDeleteConfirmation"/>
+        <Modal title="Confirm remove action" target={this.state.langToRemove !== null ?
+        this.props.languages[this.state.langToRemove].name : ""}
+        confirm={this.onLangRemoval} id="langDeleteConfirmation"/>
 
-      <Modal title="Confirm remove action" target={this.state.expToRemove !== null ?
-      this.props.experience[this.state.expToRemove].title : ""}
-      confirm={this.onExpRemoval} id="expDeleteConfirmation"/>
+        <Modal title="Confirm remove action" target={this.state.expToRemove !== null ?
+        this.props.experience[this.state.expToRemove].title : ""}
+        confirm={this.onExpRemoval} id="expDeleteConfirmation"/>
 
-      <Modal title="Confirm remove action" target={this.state.eduToRemove !== null ?
-      this.props.education[this.state.eduToRemove].title : ""}
-      confirm={this.onEduRemoval} id="eduDeleteConfirmation"/>
+        <Modal title="Confirm remove action" target={this.state.eduToRemove !== null ?
+        this.props.education[this.state.eduToRemove].title : ""}
+        confirm={this.onEduRemoval} id="eduDeleteConfirmation"/>
         <h1>Your CV</h1>
         <div className="container-fluid my-2">
           <form onSubmit={this.onAvatarSubmit}>
@@ -228,6 +233,18 @@ class CV extends Component {
             </div>
 
             <div className="form-row">
+              <div className="form-group col-6">
+                <label htmlFor="github">Github</label>
+                <input type="text" id="github" className="form-control"
+                onChange={this.onPersonalChange} value={this.state.github} />
+              </div>
+              <div className="form-group col-6">
+                <label htmlFor="currentgithub">Current</label>
+                <p id="currentgithub">{this.props.github}</p>
+              </div>
+            </div>
+
+            <div className="form-row">
               <div className="form-group col-md-6">
                 <label htmlFor="description">Short description</label>
                 <textarea id="description" className="form-control" rows="4"
@@ -236,6 +253,18 @@ class CV extends Component {
               <div className="form-group col-md-6">
                 <label htmlFor="currentdescription">Current</label>
                 <p id="currentdescription">{this.props.description}</p>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group col-md-6">
+                <label htmlFor="interests">Interests/Hobbies</label>
+                <textarea id="interests" className="form-control" rows="4"
+                onChange={this.onPersonalChange} value={this.state.interests}></textarea>
+              </div>
+              <div className="form-group col-md-6">
+                <label htmlFor="currentinterests">Current</label>
+                <p id="currentinterests">{this.props.interests}</p>
               </div>
             </div>
 
@@ -343,7 +372,7 @@ class CV extends Component {
             <button type="submit" className="btn btn-lg btn-primary">Save header</button>
           </div>
         </form>
-      </main>
+      </div>
     );
   }
 }
