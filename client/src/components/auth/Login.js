@@ -14,7 +14,8 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = state => {
   return {
-    errors: state.loginErrors
+    errors: state.loginErrors,
+    loading: state.auth.loading
   };
 };
 
@@ -73,7 +74,9 @@ class Login extends Component {
             </div>
           </div>
           <div className="form-group">
-            <button type="submit" className="btn btn-lg btn-block btn-primary">Login</button>
+            <button type="submit" className="btn btn-lg btn-block btn-primary"
+            disabled={this.props.loading}>
+            {this.props.loading ? "Loading..." : "Login"}</button>
           </div>
           <div className={classnames({"alert alert-danger": errors.error}, "mt-2")}
           role="alert">
