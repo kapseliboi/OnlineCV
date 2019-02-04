@@ -14,6 +14,9 @@ const CVSchema = new Schema ({
   email: {
     type: String
   },
+  github: {
+    type: String
+  },
   interests: {
     type: String
   },
@@ -64,7 +67,7 @@ const CVSchema = new Schema ({
     name: {
       type: String
     },
-    skill: {
+    description: {
       type: String
     }
   }],
