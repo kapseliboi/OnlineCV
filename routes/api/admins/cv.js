@@ -68,9 +68,11 @@ router.post("/avatar", upload, (req, res) => {
 });
 
 router.post("/personal", (req, res) => {
-  if (req.body.phone && req.body.email && req.body.description) {
+  if (req.body.phone && req.body.email && req.body.description &&
+  req.body.interests && req.body.github) {
     CV.updateOne({owner: req.user.id}, {phone: req.body.phone,
-    email: req.body.email, description: req.body.description}, {upsert: true},
+    email: req.body.email, description: req.body.description,
+    interests: req.body.interests, github: req.body.github}, {upsert: true},
     (err, raw) => {
       if (err) {
         return res.status(500).json({error: "Something went wrong."});
