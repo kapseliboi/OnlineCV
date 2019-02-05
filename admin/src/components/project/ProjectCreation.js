@@ -9,8 +9,8 @@ import {createOrUpdateProject} from "../../actions/projectActions";
 
 function mapDispatchToProps(dispatch) {
   return {
-    createOrUpdateProject: (formData, title, history, index, removedImgs) => dispatch(
-      createOrUpdateProject(formData, title, history, index, removedImgs))
+    createOrUpdateProject: (formData, title, history, index) => dispatch(
+      createOrUpdateProject(formData, title, history, index))
   };
 }
 
@@ -49,8 +49,7 @@ class ProjectCreation extends Component {
       content: newContent,
       id: id,
       toRemove: null,
-      edit: edit,
-      removedImages: []
+      edit: edit
     };
   }
 
@@ -58,11 +57,11 @@ class ProjectCreation extends Component {
     event.preventDefault();
     if (this.state.edit) {
       this.props.createOrUpdateProject(this.state.content, this.state.title,
-        this.props.history, this.props.match.params.index, this.state.removedImages);
+        this.props.history, this.props.match.params.index);
     }
     else {
       this.props.createOrUpdateProject(this.state.content, this.state.title,
-        this.props.history, null, null);
+        this.props.history, null);
     }
   };
 
@@ -86,15 +85,7 @@ class ProjectCreation extends Component {
   onImageChange = (i, event) => {
     const newContent = this.state.content.slice();
     newContent[i].file = event.target.files[0];
-    if (newContent[i].url && this.state.removedImages.indexOf(newContent[i].url) === -1) {
-      this.setState({
-        content: newContent,
-        removedImages: this.state.removedImages.concat(newContent[i].url)
-      });
-    }
-    else {
-      this.setState({ content: newContent });
-    }
+    this.setState({ content: newContent });
   };
 
   addImageField = () => {
@@ -147,17 +138,9 @@ class ProjectCreation extends Component {
   onRemoval = () => {
     var newContent = this.state.content.slice();
     newContent.splice(this.state.toRemove, 1);
-    if (this.state.content[this.state.toRemove].url) {
-      const removedURL = this.state.content[this.state.toRemove].url;
-      this.setState({
-        content: newContent,
-        toRemove: null,
-        removedImages: this.state.removedImages.concat(removedURL)
-      });
-    }
-    else {
-      this.setState({ content: newContent, toRemove: null });
-    }
+
+    this.setState({ content: newContent, toRemove: null });
+
   }
 
 
@@ -172,7 +155,7 @@ class ProjectCreation extends Component {
           onDescriptonChange={this.onImageDescriptionChange}
           setRemoved={this.setToBeRemoved} edit={this.state.edit}
           moveUp={this.onMoveFieldUp} moveDown={this.onMoveFieldDown}
-          key={field.id} />
+          key={field.id} modal="deleteConfirmation" />
         );
       }
       else {
@@ -181,7 +164,7 @@ class ProjectCreation extends Component {
           index={i} onTextChange={this.onTextChange}
           setRemoved={this.setToBeRemoved}
           moveUp={this.onMoveFieldUp} moveDown={this.onMoveFieldDown}
-          key={field.id} />
+          key={field.id} modal="deleteConfirmation" />
         );
       }
     });
@@ -210,7 +193,8 @@ class ProjectCreation extends Component {
 
     return (
       <main className="py-md-4 pl-md-5">
-        <Modal title="Confirm remove action" target={target} confirm={this.onRemoval} />
+        <Modal title="Confirm remove action" target={target} confirm={this.onRemoval}
+        id="deleteConfirmation" />
         <form encType="multipart/form-data">
           <div className="form-group">
             <label htmlFor="title">Project title</label>
