@@ -36,10 +36,14 @@ export const registerUser = (userData, history) => dispatch => {
 export const logoutUser = () => dispatch => {
   axios.post("/api/users/logout").then(
     res => {
-      window.location.href = "http://localhost:3000";
+      window.location.href = process.env.NODE_ENV === "production" ?
+      window.location.protocol + "//" + window.location.hostname +
+      ":" + window.location.port : "http://localhost:3000";
     }
   ).catch(function(err) {
-    window.location.href = "http://localhost:3000";
+    window.location.href = process.env.NODE_ENV === "production" ?
+    window.location.protocol + "//" + window.location.hostname +
+    ":" + window.location.port : "http://localhost:3000";
   }
   );
 };
