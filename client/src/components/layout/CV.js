@@ -28,7 +28,7 @@ const CV = (props) => {
           <h3 className="text-white my-5"><b>{props.name}</b></h3>
         </div>
         <div className="col-md-4 col-lg-4">
-          <img src={"http://localhost:5000/"+props.avatar} alt="Avatar"
+          <img src={props.avatar} alt="Avatar"
           className="rounded" width="80%" />
         </div>
 
