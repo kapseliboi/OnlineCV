@@ -83,7 +83,8 @@ export default function (state = initialState, action) {
           expID: expID,
           eduID: eduID,
           langID: langID,
-          techID: techID
+          techID: techID,
+          github: action.payload.github
         };
       }
       else {
