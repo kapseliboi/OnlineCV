@@ -21,7 +21,7 @@ const TextField = props => {
         onClick={() => props.moveDown(props.index)}>&#8595;</button>
 
         <button className="btn btn-danger mx-1" type="button"
-        data-toggle="modal" data-target="#deleteConfirmation"
+        data-toggle="modal" data-target={"#"+props.modal}
         onClick={() => props.setRemoved(props.index)}>&#10006;</button>
       </div>
     </div>
