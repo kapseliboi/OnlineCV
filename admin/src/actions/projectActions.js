@@ -5,8 +5,7 @@ import { CREATING_PROJECT, CREATE_PROJECT, MOVE_PROJECT_UP, MOVE_PROJECT_DOWN,
 from "./types";
 
 
-export const createOrUpdateProject = (data, title, history, index,
-  removedImgs) => dispatch => {
+export const createOrUpdateProject = (data, title, history, index) => dispatch => {
   dispatch({ type: CREATING_PROJECT });
   var formData = new FormData();
   for (var i = 0; i < data.length; i++) {
@@ -17,9 +16,11 @@ export const createOrUpdateProject = (data, title, history, index,
       if (data[i].file) {
         formData.append("file", data[i].file);
         formData.append("url", null);
+        formData.append("imgID", null);
       }
       else {
         formData.append("url", data[i].url);
+        formData.append("imgID", data[i].imgID);
       }
     }
     else {
@@ -30,10 +31,6 @@ export const createOrUpdateProject = (data, title, history, index,
   var postURL;
   if (index) {
     formData.append("index", index);
-    for (var j = 0; j < removedImgs.length; j++) {
-      console.log(removedImgs[j]);
-      formData.append("removedImg", removedImgs[j]);
-    }
     postURL = "/api/admins/projects/update";
   }
   else {
@@ -47,6 +44,7 @@ export const createOrUpdateProject = (data, title, history, index,
         if (instance.type === "image") {
           delete instance.file;
           instance.url = res.data.imgURLs[imgIndex];
+          instance.imgID = res.data.imgIDs[imgIndex];
           imgIndex++;
         }
         return instance;
