@@ -87,7 +87,8 @@ router.post("/login", (req, res) => {
         expiresIn: "24h"
       },
       (err, token) => {
-        res.cookie("jwt", token, {httpOnly: true, maxAge: 86400000});
+        res.cookie("jwt", token, {httpOnly: true, maxAge: 86400000,
+        secure: process.env.NODE_ENV === "production"});
         if (user.isAdmin) {
           return res.json({payload});
         }
