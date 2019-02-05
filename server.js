@@ -20,17 +20,17 @@ const app = express();
 
 app.use(helmet());
 
-// if (process.env.NODE_ENV === "production") {
-//   app.use(compression());
-//   app.use((req, res, next) => {
-//     if (!req.secure) {
-//       var secureUrl = "https://" + req.headers["host"] + req.url;
-//       res.writeHead(301, {"Location": secureUrl});
-//       return res.end();
-//     }
-//     next();
-//   });
-// }
+if (process.env.NODE_ENV === "production") {
+  app.use(compression());
+  app.use((req, res, next) => {
+    if (!req.secure) {
+      var secureUrl = "https://" + req.headers["host"] + req.url;
+      res.writeHead(301, {"Location": secureUrl});
+      return res.end();
+    }
+    next();
+  });
+}
 
 // Bodyparser middleware used to parse incoming request bodies
 app.use(
