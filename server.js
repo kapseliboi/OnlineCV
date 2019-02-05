@@ -5,6 +5,8 @@ const passport = require("passport");
 
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const compression = require("compression");
 
 const path = require("path");
 
@@ -16,6 +18,19 @@ const cv = require("./routes/api/admins/cv");
 
 const app = express();
 
+app.use(helmet());
+
+// if (process.env.NODE_ENV === "production") {
+//   app.use(compression());
+//   app.use((req, res, next) => {
+//     if (!req.secure) {
+//       var secureUrl = "https://" + req.headers["host"] + req.url;
+//       res.writeHead(301, {"Location": secureUrl});
+//       return res.end();
+//     }
+//     next();
+//   });
+// }
 
 // Bodyparser middleware used to parse incoming request bodies
 app.use(
@@ -64,7 +79,7 @@ app.get("/api/csrftoken", (req, res) => {
 });
 
 app.use("/images", passport.authenticate("jwt", {session: false}),
-express.static("images"));
+express.static(path.join(__dirname, "images")));
 
 // Error handling
 app.use((err, req, res, next) => {
@@ -75,12 +90,32 @@ app.use((err, req, res, next) => {
   }
   res.status(403).json({ error: "Form has been tampered with" });
 });
+
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static("client/build"));
-  app.set("views", "client/views");
-  app.set("view engine", "ejs");
-  app.get("/", (req, res) => {
-    res.render("index");
+  app.use(express.static(path.join(__dirname, "client", "build")));
+  app.use(express.static(path.join(__dirname, "admin", "build")));
+
+  app.get("/admin/*",
+  (req, res, next) => {
+    passport.authenticate("jwt", (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        return res.status(401).json({error: "Not authenticated"});
+      }
+      if (!user.isAdmin) {
+        return res.status(401).json({error: "Not an admin"});
+      }
+      req.user = user;
+      next();
+    })(req, res, next);},
+
+    (req, res) => {
+    res.sendFile(path.join(__dirname, "admin", "build", "index.html"));
+  });
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
   });
 }
 
