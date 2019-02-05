@@ -26,8 +26,14 @@ export const loginUser = (userData, history) => dispatch => {
       const {payload} = res.data;
       if ( payload.isAdmin ){
         window.location.href = "http://localhost:3001";
+        // DEPLOYMENT window.location.protocol + "//" + window.location.hostname +
+        // ":" + window.location.port
       }
       else {
+        dispatch({
+          type: GET_LOGIN_ERRORS,
+          payload: {errors: null}
+        });
         dispatch({
           type: SET_CURRENT_USER,
           payload: payload
