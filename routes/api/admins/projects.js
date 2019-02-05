@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("cloudinary");
+const cloudinaryStorage = require("multer-storage-cloudinary");
 
+const keys = require("../../../config/keys");
 const Project = require("../../../models/Project");
 const parseForm = require("../../../utils/parseForm");
 
@@ -25,8 +26,14 @@ router.use((req, res, next) => {
   })(req, res, next);
 });
 
-// Only accept image files
+// Cloudinary settings
+cloudinary.config({
+  cloud_name: keys.cloudinaryName,
+  api_key: keys.cloudinaryKey,
+  api_secret: keys.cloudinarySecret
+});
 
+// Only accept image files
 function fileFilter(req, file, cb) {
   if (file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
     return cb(null, true);
@@ -36,13 +43,10 @@ function fileFilter(req, file, cb) {
 
 // Multer settings
 
-const upload = multer({ storage: multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./images");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
-  }
+const upload = multer({ storage: cloudinaryStorage({
+  cloudinary: cloudinary,
+  folder: "cv",
+  allowedFormats: ["jpg", "jpeg", "gif", "png"]
 }),
   fileFilter: fileFilter
 }).any();
@@ -51,7 +55,7 @@ const upload = multer({ storage: multer.diskStorage({
 router.post("/create", upload, (req, res) => {
   var countPromise = Project.countDocuments({ owner: req.user.id }).exec();
 
-  const {content, imgURLs} = parseForm(req);
+  const {content, imgURLs, imgIDs} = parseForm(req);
 
   countPromise.then((count) => {
     const newProject = new Project({
@@ -65,7 +69,7 @@ router.post("/create", upload, (req, res) => {
         return res.status(400).json(err);
       }
       else {
-        res.json({success: true, imgURLs: imgURLs});
+        res.json({imgURLs: imgURLs, imgIDs: imgIDs});
       }
     });
   }).catch( err => {
@@ -78,29 +82,55 @@ router.post("/create", upload, (req, res) => {
 
 
 router.post("/update", upload, (req, res) => {
-  if (req.body.removedImg){
-    if (Array.isArray(req.body.removedImg)){
-      for (var i = 0; i < req.body.removedImg.length; i++){
-        fs.unlink(req.body.removedImg[i], err => {
-          console.log(err);
-        });
-      }
-    }
-    else {
-      fs.unlink(req.body.removedImg, err => {
-        console.log(err);
-      });
-    }
-  }
+  var {content, imgURLs, imgIDs} = parseForm(req);
 
-  const {content, imgURLs} = parseForm(req);
-
-  Project.updateOne({position: req.body.index, owner: req.user.id},
-    {title: req.body.title, content: content}, (err, raw) => {
+  Project.findOneAndUpdate({position: req.body.index, owner: req.user.id},
+  {title: req.body.title, content: content}, {fields: {"content": 1}}, (err, project) => {
       if (err) {
         return res.status(500).json({error: "Something went wrong, please try again."});
       }
-      res.json({success: true, imgURLs: imgURLs});
+      if (!project) {
+        return res.status(400).json({error: "Project was not found."});
+      }
+      res.json({success: true, imgURLs: imgURLs, imgIDs: imgIDs});
+
+      var oldImgURLs = [];
+      for (var h=0; h < project.content.length; h++) {
+        if (project.content[h].type === "image") {
+          oldImgURLs.push({id: project.content[h].imgID, url: project.content[h].url});
+        }
+      }
+      // Sort the arrays and find out which image has been removed or if any
+      imgIDs.sort();
+      oldImgURLs.sort((a,b) => (a.url > b.url) ? 1 : ((b.url > a.url) ? -1 : 0));
+      var i = 0;
+      var j = 0;
+      var removedImgs = [];
+      while(i < imgIDs.length && j < oldImgURLs.length) {
+        if (imgIDs[i] < oldImgURLs[j].id) {
+          i++;
+        }
+        else if (oldImgURLs[j].id < imgIDs[i]) {
+          removedImgs.push(oldImgURLs[j].id);
+          j++;
+        }
+        else {
+          i++;
+          j++;
+        }
+      }
+      // If new imageIDs ran out before old ones
+      while (j < oldImgURLs.length) {
+        removedImgs.push(oldImgURLs[j].id);
+        j++;
+      }
+      for (var k=0; k < removedImgs.length; k++) {
+        cloudinary.v2.uploader.destroy(removedImgs[k], (err2, result) => {
+          if (err2) {
+            console.log(err2);
+          }
+        });
+      }
     });
 });
 
@@ -159,8 +189,10 @@ router.post("/delete", (req, res) => {
     else {
       for (var i=0; i < project.content.length; i++){
         if (project.content[i].type === "image") {
-          fs.unlink(project.content[i].url, err => {
-            console.log(err);
+          cloudinary.v2.uploader.destroy(project.content[i].imgID, (err, result) => {
+            if (err) {
+              console.log(err);
+            }
           });
         }
       }
@@ -174,7 +206,11 @@ router.post("/delete", (req, res) => {
       }
       return res.json();
     });
-  });
+  }).catch(
+    err => {
+      console.log(err);
+    }
+  );
 });
 
 module.exports = router;

@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("cloudinary");
+const cloudinaryStorage = require("multer-storage-cloudinary");
 
+const keys = require("../../../config/keys");
 const CV = require("../../../models/CV");
 // Admin only authentication
 router.use((req, res, next) => {
@@ -23,8 +24,14 @@ router.use((req, res, next) => {
   })(req, res, next);
 });
 
-// Only accept image files
+// Cloudinary settings
+cloudinary.config({
+  cloud_name: keys.cloudinaryName,
+  api_key: keys.cloudinaryKey,
+  api_secret: keys.cloudinarySecret
+});
 
+// Only accept image files
 function fileFilter(req, file, cb) {
   if (file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
     return cb(null, true);
@@ -34,32 +41,30 @@ function fileFilter(req, file, cb) {
 
 // Multer settings
 
-const upload = multer({ storage: multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./images");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
-  }
+const upload = multer({ storage: cloudinaryStorage({
+  cloudinary: cloudinary,
+  folder: "cv",
+  allowedFormats: ["jpg", "jpeg", "gif", "png"]
 }),
   fileFilter: fileFilter
 }).single("avatar");
 
 router.post("/avatar", upload, (req, res) => {
   if (req.file) {
-    CV.findOneAndUpdate({owner: req.user.id}, {avatar: req.file.path},
+    CV.findOneAndUpdate({owner: req.user.id},
+      {avatar: req.file.secure_url, avatarID: req.file.public_id},
       {upsert: true, fields: {"avatar": 1}}, (err, cv) => {
         if (err) {
           return res.status(500).json({error: "Something went wrong"});
         }
         if (cv) {
-          fs.unlink(cv.avatar, err => {
+          cloudinary.v2.uploader.destroy(cv.avatarID, (err, result) => {
             if (err) {
               console.log(err);
             }
           });
         }
-        return res.json({avatar: req.file.path});
+        return res.json({avatar: req.file.secure_url});
       });
   }
   else {
