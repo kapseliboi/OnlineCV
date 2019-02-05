@@ -198,7 +198,7 @@ class CV extends Component {
                 className="form-control-file" />
               </div>
               <div className="form-group">
-                <a href={"/" + this.props.avatar} target="_blank"
+                <a href={this.props.avatar} target="_blank"
                 rel="noopener noreferrer">Current avatar</a>
               </div>
             </div>
