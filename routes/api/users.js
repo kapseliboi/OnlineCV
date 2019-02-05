@@ -89,7 +89,6 @@ router.post("/login", (req, res) => {
       (err, token) => {
         res.cookie("jwt", token, {httpOnly: true, maxAge: 86400000});
         if (user.isAdmin) {
-          console.log("done");
           return res.json({payload});
         }
         return startData(user, res);
