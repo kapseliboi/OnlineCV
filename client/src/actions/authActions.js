@@ -27,7 +27,7 @@ export const loginUser = (userData, history) => dispatch => {
       if ( payload.isAdmin ){
         window.location.href = process.env.NODE_ENV === "production" ?
         window.location.protocol + "//" + window.location.hostname +
-        ":" + window.location.port : "http://localhost:3000";
+        ":" + window.location.port + "/admin/" : "http://localhost:3001";
       }
       else {
         dispatch({
