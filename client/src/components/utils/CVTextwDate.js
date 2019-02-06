@@ -10,8 +10,8 @@ const CVTextwDate = props => {
     <div className="row">
       <div className="col-3">
         <div className="ml-3">
-          <p>{start.getFullYear() + "-" + start.getMonth() + " -"}<br/>
-          {end ? end.getFullYear() + "-" + end.getMonth() : "present"}</p>
+          <p>{start.getFullYear() + "-" + start.getMonth() + 1 + " -"}<br/>
+          {end ? end.getFullYear() + "-" + end.getMonth() + 1 : "present"}</p>
         </div>
       </div>
       <div className="col-9">
