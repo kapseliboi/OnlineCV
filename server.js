@@ -22,6 +22,12 @@ app.use(helmet());
 
 if (process.env.NODE_ENV === "production") {
   app.use(compression());
+  app.use((req, res, next) => {
+    if (!req.secure && req.get("x-forwarded-proto") !== "https") {
+      return res.redirect("https://" + req.get("host") + req.url);
+    }
+    next();
+  });
 }
 
 // Bodyparser middleware used to parse incoming request bodies
