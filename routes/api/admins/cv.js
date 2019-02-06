@@ -53,7 +53,7 @@ router.post("/avatar", upload, (req, res) => {
   if (req.file) {
     CV.findOneAndUpdate({owner: req.user.id},
       {avatar: req.file.secure_url, avatarID: req.file.public_id},
-      {upsert: true, fields: {"avatar": 1}}, (err, cv) => {
+      {upsert: true, fields: {"avatar": 1, "avatarID": 1}}, (err, cv) => {
         if (err) {
           return res.status(500).json({error: "Something went wrong"});
         }
