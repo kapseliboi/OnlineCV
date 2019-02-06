@@ -25,7 +25,7 @@ class App extends Component {
 
   render() {
     return (
-      <Router>
+      <Router basename="/admin">
         <div className="App">
           <h1 className="display-1 text-center w-100">OnlineCV</h1>
           <Navbar />
