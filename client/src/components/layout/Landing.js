@@ -3,12 +3,13 @@ import React, { Component } from "react";
 import Login from "./../auth/Login";
 
 class Landing extends Component {
-  
+
   render () {
     return (
       <div className="container">
-        <div>
-          <h1 className="display-1 text-center">OnlineCV</h1>
+        <div className="justify-content-center">
+          <h1 className="d-none d-sm-block display-1 text-center">OnlineCV</h1>
+          <h1 className="d-sm-none display-4 text-center">OnlineCV</h1>
         </div>
         <div className="mt-5 align-items-center">
           <h1 className="text-center">Welcome!</h1>
