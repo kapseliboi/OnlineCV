@@ -1,6 +1,4 @@
 const JwtStrategy = require("passport-jwt").Strategy;
-const mongoose = require("mongoose");
-const User = mongoose.model("User");
 const keys = require("../config/keys");
 
 const cookieExtractor = (req) => {
